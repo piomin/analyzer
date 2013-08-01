@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<faces-config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    version="2.0"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd" >
+
+<!--     <lifecycle> -->
+<!-- com.liferay.faces.util.lifecycle.DebugPhaseListener -->
+<!--     </lifecycle> -->
+
+    <application>
+	    <el-resolver>
+	        org.springframework.web.jsf.el.SpringBeanFacesELResolver
+	    </el-resolver>
+	    <locale-config>
+	    	<default-locale>pl_PL</default-locale>
+	    	<supported-locale>en_GB</supported-locale>
+	    </locale-config>
+	</application>
+
+</faces-config>
