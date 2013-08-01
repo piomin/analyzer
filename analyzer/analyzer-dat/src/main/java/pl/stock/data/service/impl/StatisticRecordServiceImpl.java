@@ -12,7 +12,7 @@ import pl.stock.data.service.StatisticRecordService;
 
 @Service
 @Transactional
-public class StatisticRecordServiceImpl extends GenericServiceImpl<Long> implements StatisticRecordService {
+public class StatisticRecordServiceImpl extends GenericServiceImpl<Long, StatisticRecord> implements StatisticRecordService {
 
 	@Autowired
 	public void setUpdateHistoryDao(StatisticRecordDao statisticRecordDao) {

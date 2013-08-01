@@ -9,57 +9,53 @@ import java.util.List;
  *
  * @param <P> - entity primary key type 
  */
-public interface GenericService<P extends Serializable> {
+public interface GenericService<P extends Serializable, T extends GenericEntity<P>> {
 
 	/**
-	 * Count number of entities
-	 * @param c - antity class 
+	 * Count number of entities 
 	 * @return - number of entities
 	 */
-	public int count(Class<? extends Serializable> c);
+	public int count();
 	
 	/**
 	 * Add new entity service
 	 * @param entity - entity
 	 * @return - entity with primary key
 	 */
-	public P add(GenericEntity<P> entity);
+	public P add(T entity);
 
 	/**
 	 * Add or update entity if exists
 	 * @param entity - entity
 	 * @return - entity with primary key
 	 */
-	public GenericEntity<P> save(GenericEntity<P> entity);
+	public T save(T entity);
 
 	/**
 	 * Remove entity service
 	 * @param entity - entity
 	 */
-	public void remove(GenericEntity<P> entity);
+	public void remove(T entity);
 
 	/**
 	 * Find entity by primary key service
 	 * @param pk - primary key
-	 * @param c - searched object type
 	 * @return - found entity
 	 */
-	public GenericEntity<P> load(P pk, Class<? extends Serializable> c);
+	public T load(P pk);
 
 	/**
 	 * Load all existing entities service
-	 * @param c - searched object type
 	 * @return - list with entities
 	 */
-	public List<? extends Serializable> loadAll(Class<? extends Serializable> c);
+	public List<T> loadAll();
 
 	/**
 	 * Load all existing entities with criteria
-	 * @param c - searched object type 
 	 * @param maxResults - maximum number of results
 	 * @param firstResult - offset
 	 * @return - list with entities
 	 */
-	public List<Serializable> loadAllWithPagination(Class<? extends Serializable> c, int maxResults, int firstResult);
+	public List<T> loadAllWithPagination(int maxResults, int firstResult);
 
 }

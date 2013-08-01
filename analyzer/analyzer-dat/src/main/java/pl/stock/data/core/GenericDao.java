@@ -3,22 +3,34 @@ package pl.stock.data.core;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 
+ * @author Piotr Mińkowski
+ *
+ * @param <P> - primary key type
+ * @param <T> - entity object type
+ */
+public interface GenericDao<P extends Serializable, T extends GenericEntity<P>> {
 
-public interface GenericDao<P extends Serializable> {
-
+	/**
+	 * Returns entity class type
+	 * @return
+	 */
+	Class<T> getEntityClass();
+	
 	/**
 	 * Count number of records
 	 * @param c - entity class
 	 * @return - number of records
 	 */
-	public int count(Class<? extends Serializable> c);
+	int count();
 	
 	/**
 	 * Insert new record
 	 * @param entity - entity
 	 * @return - primary key
 	 */
-	public P save(GenericEntity<P> entity);
+	P save(T entity);
 	
 	/**
 	 * Select record from table by primary key
@@ -26,14 +38,14 @@ public interface GenericDao<P extends Serializable> {
 	 * @param c - entity class
 	 * @return - entity instance
 	 */
-	public GenericEntity<P> load(P pk, Class<Serializable> c);
+	T load(P pk);
 	
 	/**
 	 * Select all records from table
 	 * @param c - entity class
 	 * @return - entities list
 	 */
-	public List<? extends Serializable> loadAll(Class<? extends Serializable> c);
+	List<T> loadAll();
 	
 	/**
 	 * Select all records from table
@@ -42,25 +54,25 @@ public interface GenericDao<P extends Serializable> {
 	 * @param firstResult - offset
 	 * @return - entities list
 	 */
-	public List<Serializable> loadAllWithPagination(Class<Serializable> c, int maxResults, int firstResult);
+	List<T> loadAllWithPagination(int maxResults, int firstResult);
 	
 	/**
 	 * Remove record from table
 	 * @param t - removed entity
 	 */
-	public void delete(GenericEntity<P> t);
+	void delete(T t);
 	
 	/**
 	 * Merge detached entity
 	 * @param t - entity to be merged
 	 * @return
 	 */
-	public GenericEntity<P> merge(GenericEntity<P> t);
+	T merge(T t);
 	
 	/**
 	 * Update record
 	 * @param t
 	 */
-	public void update(GenericEntity<P> t);
+	void update(T t);
 	
 }

@@ -15,8 +15,12 @@ import pl.stock.data.entity.DailyQuoteRecord;
  *
  */
 @Repository
-public class DailyQuoteRecordDaoImpl extends GenericDaoImpl<Long> implements DailyQuoteRecordDao {
+public class DailyQuoteRecordDaoImpl extends GenericDaoImpl<Long, DailyQuoteRecord> implements DailyQuoteRecordDao {
 
+	public DailyQuoteRecordDaoImpl() {
+		setEntityClass(DailyQuoteRecord.class);
+	}
+	
 	public DailyQuoteRecord findLastByCompany(Company company) {
 		return (DailyQuoteRecord) this.getCurrentSession()
 				.createQuery("select a from DailyQuoteRecord a left join fetch a.statistic c where a.id = (select max(id) from DailyQuoteRecord b where b.company = :company)").setEntity("company", company)

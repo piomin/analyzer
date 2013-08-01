@@ -14,8 +14,12 @@ import pl.stock.data.entity.Company;
  *
  */
 @Repository
-public class CompanyDaoImpl extends GenericDaoImpl<Integer> implements CompanyDao {
+public class CompanyDaoImpl extends GenericDaoImpl<Integer, Company> implements CompanyDao {
 
+	public CompanyDaoImpl() {
+		setEntityClass(Company.class);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public Company findBySymbol(final String symbol) {
 		List<Object> objects = this.getCurrentSession().createQuery("from Company a where a.symbol = :symbol").setString("symbol", symbol).list();

@@ -6,14 +6,14 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.HibernateCallback;
 
 
-public class GenericDaoImpl<P extends Serializable> implements GenericDao<P> {
-
-	private SessionFactory sessionFactory;
+public class GenericDaoImpl<P extends Serializable, T extends GenericEntity<P>> implements GenericDao<P, T> {
 	
-	protected final Session getCurrentSession(){
+	private SessionFactory sessionFactory;
+	private Class<T> entityClass;
+	
+	protected final Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();
 	}
 	   
@@ -22,53 +22,62 @@ public class GenericDaoImpl<P extends Serializable> implements GenericDao<P> {
 		this.sessionFactory = sessionFactory;
 	}
 
+	@Override
+	public Class<T> getEntityClass() {
+		return entityClass;
+	}
+
+	public void setEntityClass(Class<T> entityClass) {
+		this.entityClass = entityClass;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
-	public P save(GenericEntity<P> t) {
+	public P save(T t) {
 		return (P) this.getCurrentSession().save(t);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public GenericEntity<P> load(P pk, Class<Serializable> c) {
-		return (GenericEntity<P>) this.getCurrentSession().get(c, pk);
+	public T load(P pk) {
+		return (T) this.getCurrentSession().get(this.entityClass, pk);
 	}
 
 	@Override
-	public void delete(GenericEntity<P> t) {
+	public void delete(T t) {
 		this.getCurrentSession().delete(t);	
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public GenericEntity<P> merge(GenericEntity<P> t) {
-		GenericEntity<P> tNew = (GenericEntity<P>) this.getCurrentSession().merge(t);
+	public T merge(T t) {
+		T tNew = (T) this.getCurrentSession().merge(t);
 		return tNew;
 	}
 
 	@Override
-	public void update(GenericEntity<P> t) {
+	public void update(T t) {
 		this.getCurrentSession().update(t);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<? extends Serializable> loadAll(Class<? extends Serializable> c) {
-		return getCurrentSession().createQuery("from " + c.getName()).list();
+	public List<T> loadAll() {
+		return getCurrentSession().createQuery("from " + this.entityClass.getName()).list();
 	}
 
 	@Override
-	public List<Serializable> loadAllWithPagination(Class<Serializable> c, int maxResults, int firstResult) {
+	public List<T> loadAllWithPagination(int maxResults, int firstResult) {
 		final StringBuffer buffer = new StringBuffer();
-		buffer.append("select c from ").append(c.getName()).append(" c");
-		HibernateCallback<List<Serializable>> callback = new CoreHibernateCallbackImpl(buffer.toString(), firstResult, maxResults);
-//		return this.getCurrentSession().executeFind(callback);
+		buffer.append("select c from ").append(this.entityClass.getName()).append(" c");
+		//HibernateCallback<List<Serializable>> callback = new CoreHibernateCallbackImpl(buffer.toString(), firstResult, maxResults);
+		//return this.getCurrentSession().executeFind(callback);
 		return null;
 	}
 
 	@Override
-	public int count(Class<? extends Serializable> c) {
-		return ((Long) getCurrentSession().createQuery("select count(id) from " + c.getName()).uniqueResult()).intValue();
+	public int count() {
+		return ((Long) getCurrentSession().createQuery("select count(id) from " + this.entityClass.getName()).uniqueResult()).intValue();
 	}
 
 }

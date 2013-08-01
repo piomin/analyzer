@@ -94,7 +94,7 @@ public class StockLogicService {
 	 * @return - true if it is initial update
 	 */
 	public boolean checkIfInitialUpdate() {
-		if (updateService.count(UpdateHistory.class) == 0) {
+		if (updateService.count() == 0) {
 			return true;
 		} else {
 			return false;
@@ -105,11 +105,10 @@ public class StockLogicService {
 	/**
 	 * Process daily statistic calculation for all companies
 	 */
-	@SuppressWarnings("unchecked")
 	public void processDailyCalculation() {
 		
 		// load all actual companies from database
-		final List<Company> companies = (List<Company>) companyService.loadAll(Company.class);
+		final List<Company> companies = (List<Company>) companyService.loadAll();
 
 		// getting today date
 		final Date today = new Date();
@@ -190,14 +189,13 @@ public class StockLogicService {
 		}	
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void processInitialCalculation() {
 
 		// TODO - statistics should be cleaned in the beginning
 //		statisticDAO.removeAll();
 		
 		// load all actual companies from database
-		final List<Company> companies = (List<Company>) companyService.loadAll(Company.class);
+		final List<Company> companies = (List<Company>) companyService.loadAll();
 		
 		// iterate over all companies 
 		for (Company company : companies) {

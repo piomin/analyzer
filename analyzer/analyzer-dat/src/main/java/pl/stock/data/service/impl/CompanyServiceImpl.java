@@ -11,7 +11,7 @@ import pl.stock.data.service.CompanyService;
 
 @Service
 @Transactional
-public class CompanyServiceImpl extends GenericServiceImpl<Integer> implements CompanyService {
+public class CompanyServiceImpl extends GenericServiceImpl<Integer, Company> implements CompanyService {
 
 	@Override
 	public Company findBySymbol(String symbol) {

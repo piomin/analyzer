@@ -3,6 +3,7 @@ package pl.stock.data.core;
 import java.io.Serializable;
 
 public abstract class GenericEntity<P extends Serializable> implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 
 	public abstract P getPrimaryKey();

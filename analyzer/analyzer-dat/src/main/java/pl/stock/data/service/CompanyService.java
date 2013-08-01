@@ -3,7 +3,7 @@ package pl.stock.data.service;
 import pl.stock.data.core.GenericService;
 import pl.stock.data.entity.Company;
 
-public interface CompanyService extends GenericService<Integer> {
+public interface CompanyService extends GenericService<Integer, Company> {
 
 	/**
 	 * Find company by symbol name

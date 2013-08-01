@@ -14,7 +14,7 @@ import pl.stock.data.service.DailyQuoteRecordService;
 
 @Service
 @Transactional
-public class DailyQuoteRecordServiceImpl extends GenericServiceImpl<Long> implements DailyQuoteRecordService {
+public class DailyQuoteRecordServiceImpl extends GenericServiceImpl<Long, DailyQuoteRecord> implements DailyQuoteRecordService {
 
 	@Autowired
 	public void setDailyQuoteRecordDao(DailyQuoteRecordDao dailyQuoteRecordDao) {

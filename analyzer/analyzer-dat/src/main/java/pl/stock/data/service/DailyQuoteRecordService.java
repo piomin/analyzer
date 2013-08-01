@@ -6,7 +6,7 @@ import pl.stock.data.core.GenericService;
 import pl.stock.data.entity.Company;
 import pl.stock.data.entity.DailyQuoteRecord;
 
-public interface DailyQuoteRecordService extends GenericService<Long> {
+public interface DailyQuoteRecordService extends GenericService<Long, DailyQuoteRecord> {
 
 	DailyQuoteRecord findLastByCompany(Company company);
 	

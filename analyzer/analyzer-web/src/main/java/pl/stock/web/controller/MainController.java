@@ -38,11 +38,10 @@ public class MainController {
 		this.companyService = companyService;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<DailyQuoteRecord> getRecords() {
 		if (records == null) {
 			records = new ArrayList<DailyQuoteRecord>();
-			List<Company> companies = (List<Company>) companyService.loadAll(Company.class);
+			List<Company> companies = (List<Company>) companyService.loadAll();
 			for (Company company : companies) {
 				records.add(recordService.findLastByCompany(company));
 			}

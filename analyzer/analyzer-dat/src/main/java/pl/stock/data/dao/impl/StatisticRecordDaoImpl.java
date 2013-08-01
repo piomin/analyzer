@@ -13,8 +13,12 @@ import pl.stock.data.entity.StatisticRecord;
  *
  */
 @Repository
-public class StatisticRecordDaoImpl extends GenericDaoImpl<Long> implements StatisticRecordDao {
+public class StatisticRecordDaoImpl extends GenericDaoImpl<Long, StatisticRecord> implements StatisticRecordDao {
 
+	public StatisticRecordDaoImpl() {
+		setEntityClass(StatisticRecord.class);
+	}
+	
 	public StatisticRecord findLastByQuote(DailyQuoteRecord quote) {
 		return (StatisticRecord) this.getCurrentSession()
 				.createQuery("select a from StatisticRecord a where a.id = (select max(id) from StatisticRecord b where b.quote = :quote)").setEntity("quote", quote)

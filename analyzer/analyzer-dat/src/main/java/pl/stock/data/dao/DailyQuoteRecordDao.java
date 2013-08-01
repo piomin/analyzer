@@ -6,7 +6,7 @@ import pl.stock.data.core.GenericDao;
 import pl.stock.data.entity.Company;
 import pl.stock.data.entity.DailyQuoteRecord;
 
-public interface DailyQuoteRecordDao extends GenericDao<Long> {
+public interface DailyQuoteRecordDao extends GenericDao<Long, DailyQuoteRecord> {
 
 	/**
 	 * Find newest record in daily_quote_record table for requested company

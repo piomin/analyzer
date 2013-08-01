@@ -4,22 +4,22 @@ import java.io.Serializable;
 import java.util.List;
 
 
-public abstract class GenericServiceImpl<P extends Serializable> implements GenericService<P> {
+public abstract class GenericServiceImpl<P extends Serializable, T extends GenericEntity<P>> implements GenericService<P, T> {
 
-	protected GenericDao<P> dao;
+	protected GenericDao<P, T> dao;
 	
 	@Override
-	public int count(Class<? extends Serializable> c) {
-		return dao.count(c);
+	public int count() {
+		return dao.count();
 	}
 	
 	@Override
-	public P add(GenericEntity<P> entity) {
+	public P add(T entity) {
 		return dao.save(entity);
 	}
 
 	@Override
-	public GenericEntity<P> save(GenericEntity<P> entity) {
+	public T save(T entity) {
 		if (entity.getPrimaryKey() == null) {
 			P pk = dao.save(entity);
 			entity.setPrimaryKey(pk);
@@ -29,25 +29,22 @@ public abstract class GenericServiceImpl<P extends Serializable> implements Gene
 	}
 
 	@Override
-	public void remove(GenericEntity<P> entity) {
+	public void remove(T entity) {
 		dao.delete(entity);	
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public GenericEntity<P> load(P pk, Class<? extends Serializable> c) {
-		return dao.load(pk, (Class<Serializable>)c);
+	public T load(P pk) {
+		return dao.load(pk);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<? extends Serializable> loadAll(Class<? extends Serializable> c) {
-		return dao.loadAll((Class<Serializable>) c);
+	public List<T> loadAll() {
+		return dao.loadAll();
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<Serializable> loadAllWithPagination(Class<? extends Serializable> c, int maxResults, int firstResult) {
-		return dao.loadAllWithPagination((Class<Serializable>) c, maxResults, firstResult);
+	public List<T> loadAllWithPagination(int maxResults, int firstResult) {
+		return dao.loadAllWithPagination(maxResults, firstResult);
 	}
 
 }

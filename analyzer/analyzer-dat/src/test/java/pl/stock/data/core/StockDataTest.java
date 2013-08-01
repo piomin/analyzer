@@ -107,23 +107,23 @@ public class StockDataTest {
 	public void testRead() {
 		
 		// test company service
-		final Company company = (Company) companyService.load(1, Company.class);
+		final Company company = (Company) companyService.load(1);
 		LOGGER.info("Company found -> " + company.getShortInfo());
 		
 		// test update history service
-		final UpdateHistory updateHistory = (UpdateHistory) updateService.load(1, UpdateHistory.class);
+		final UpdateHistory updateHistory = (UpdateHistory) updateService.load(1);
 		LOGGER.info("UpdateHistory found -> " + updateHistory.getShortInfo());
 		
 		// test daily quote record service
-		DailyQuoteRecord quote = (DailyQuoteRecord) quoteService.load(1L, DailyQuoteRecord.class);
+		DailyQuoteRecord quote = (DailyQuoteRecord) quoteService.load(1L);
 		LOGGER.info("DailyQuoteRecord found -> " + quote.getShortInfo());
 		
 		// test statistic service
-		final StatisticRecord statistic = (StatisticRecord) statisticService.load(1L, StatisticRecord.class);
+		final StatisticRecord statistic = (StatisticRecord) statisticService.load(1L);
 		LOGGER.info("StatisticRecord found -> " + statistic.getShortInfo());
 		
 		// test update history service count() method
-		final int count = updateService.count(DailyQuoteRecord.class);
+		final int count = updateService.count();
 		LOGGER.info("UpdateHistory count -> " + count);
 		
 		// test daily quote record service findByCompany() method 
