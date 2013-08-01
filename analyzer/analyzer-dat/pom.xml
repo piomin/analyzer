@@ -9,7 +9,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 
-	<artifactId>stock-data</artifactId>
+	<artifactId>analyzer-dat</artifactId>
 
 	<dependencies>
 		<dependency>

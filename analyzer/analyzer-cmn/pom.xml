@@ -17,8 +17,8 @@
 			<version>2.4</version>
 		</dependency>
 		<dependency>
-			<groupId>pl.stock</groupId>
-			<artifactId>stock-data</artifactId>
+			<groupId>pl.piomin.stock.gpw</groupId>
+			<artifactId>analyzer-dat</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

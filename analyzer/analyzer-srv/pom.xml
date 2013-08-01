@@ -12,14 +12,14 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>pl.stock</groupId>
-			<artifactId>stock-algorithm</artifactId>
+			<groupId>pl.piomin.stock.gpw</groupId>
+			<artifactId>analyzer-alg</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>pl.stock</groupId>
-			<artifactId>stock-commons</artifactId>
+			<groupId>pl.piomin.stock.gpw</groupId>
+			<artifactId>analyzer-cmn</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
