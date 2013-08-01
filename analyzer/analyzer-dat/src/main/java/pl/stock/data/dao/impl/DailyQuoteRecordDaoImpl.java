@@ -35,7 +35,7 @@ public class DailyQuoteRecordDaoImpl extends GenericDaoImpl<Long, DailyQuoteReco
 	@SuppressWarnings("unchecked")
 	public List<DailyQuoteRecord> findByCompany(Company company, int maxCount) {
 		final String query = "select r from DailyQuoteRecord r where r.company = :company order by r.date desc";
-		return this.getCurrentSession().createQuery(query).setMaxResults(maxCount).list();
+		return this.getCurrentSession().createQuery(query).setEntity("company", company).setMaxResults(maxCount).list();
 	}
 	
 	@SuppressWarnings("unchecked")

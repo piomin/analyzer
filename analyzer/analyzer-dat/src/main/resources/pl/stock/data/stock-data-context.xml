@@ -25,6 +25,7 @@
 				<value>pl.stock.data.entity.DailyQuoteRecord</value>
 				<value>pl.stock.data.entity.StatisticRecord</value>
 				<value>pl.stock.data.entity.UpdateHistory</value>
+				<value>pl.stock.data.entity.User</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

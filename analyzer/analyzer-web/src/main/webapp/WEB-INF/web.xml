@@ -30,27 +30,41 @@
 		<param-value>flick</param-value>
 	</context-param>
 
-	<servlet>
-		<servlet-name>Faces Servlet</servlet-name>
-		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>Faces Servlet</servlet-name>
-		<url-pattern>/faces/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Faces Servlet</servlet-name>
-		<url-pattern>*.jsf</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Faces Servlet</servlet-name>
-		<url-pattern>*.faces</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Faces Servlet</servlet-name>
-		<url-pattern>*.xhtml</url-pattern>
-	</servlet-mapping>
+<!-- 	<servlet> -->
+<!-- 		<servlet-name>Faces Servlet</servlet-name> -->
+<!-- 		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class> -->
+<!-- 		<load-on-startup>1</load-on-startup> -->
+<!-- 	</servlet> -->
+<!-- 	<servlet-mapping> -->
+<!-- 		<servlet-name>Faces Servlet</servlet-name> -->
+<!-- 		<url-pattern>/faces/*</url-pattern> -->
+<!-- 	</servlet-mapping> -->
+<!-- 	<servlet-mapping> -->
+<!-- 		<servlet-name>Faces Servlet</servlet-name> -->
+<!-- 		<url-pattern>*.jsf</url-pattern> -->
+<!-- 	</servlet-mapping> -->
+<!-- 	<servlet-mapping> -->
+<!-- 		<servlet-name>Faces Servlet</servlet-name> -->
+<!-- 		<url-pattern>*.faces</url-pattern> -->
+<!-- 	</servlet-mapping> -->
+<!-- 	<servlet-mapping> -->
+<!-- 		<servlet-name>Faces Servlet</servlet-name> -->
+<!-- 		<url-pattern>*.xhtml</url-pattern> -->
+<!-- 	</servlet-mapping> -->
+	
+	<servlet>  
+    	<servlet-name>RestFull Servlet</servlet-name>  
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>  
+        <init-param>  
+        	<param-name>contextConfigLocation</param-name>  
+           	<param-value></param-value>  
+        </init-param>  
+        <load-on-startup>1</load-on-startup>  
+    </servlet>  
+    <servlet-mapping>  
+    	<servlet-name>RestFull Servlet</servlet-name>  
+    	<url-pattern>/api/*</url-pattern>  
+    </servlet-mapping>
 	
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
