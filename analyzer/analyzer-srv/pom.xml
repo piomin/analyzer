@@ -8,7 +8,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 	
-	<artifactId>analyzer-logic</artifactId>
+	<artifactId>analyzer-srv</artifactId>
 	
 	<dependencies>
 		<dependency>

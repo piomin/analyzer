@@ -13,11 +13,10 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
 		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
-	<import resource="classpath:pl/stock/data/stock-data-context.xml" />
+	<import resource="classpath:pl/stock/logic/stock-logic-context.xml" />
 	
 	<mvc:annotation-driven />
 	
-	<context:component-scan base-package="pl.stock.data" />
 	<context:component-scan base-package="pl.stock.web" />
 	
 </beans>

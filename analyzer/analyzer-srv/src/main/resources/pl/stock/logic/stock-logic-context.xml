@@ -8,7 +8,7 @@
 	
 	<context:property-placeholder location="classpath:pl/stock/logic/stock-logic.properties" />
 
-	<task:annotation-driven />
+<!-- 	<task:annotation-driven /> -->
 
 	<context:component-scan base-package="pl.stock" />
 	

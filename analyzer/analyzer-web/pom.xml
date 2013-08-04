@@ -67,7 +67,7 @@
 		</dependency>
 		<dependency>
 			<groupId>pl.piomin.stock.gpw</groupId>
-			<artifactId>analyzer-dat</artifactId>
+			<artifactId>analyzer-srv</artifactId>
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>

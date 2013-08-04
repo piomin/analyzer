@@ -1,5 +1,8 @@
 package pl.stock.data.service.impl;
 
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,16 @@ public class StatisticRecordServiceImpl extends GenericServiceImpl<Long, Statist
 	@Override
 	public StatisticRecord findLastByQuote(DailyQuoteRecord quote) {
 		return ((StatisticRecordDao) this.dao).findLastByQuote(quote);
+	}
+
+	@Override
+	public List<StatisticRecord> findByDate(Date date) {
+		return ((StatisticRecordDao) this.dao).findByDate(date);
+	}
+
+	@Override
+	public List<StatisticRecord> findByDatePeriod(Date from, Date to) {
+		return ((StatisticRecordDao) this.dao).findByDatePeriod(from, to);
 	}
 	
 }
