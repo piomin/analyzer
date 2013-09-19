@@ -16,7 +16,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import pl.stock.data.core.GenericEntity;
+import org.hibernate.annotations.Index;
+
+import pl.piomin.core.data.generic.GenericEntity;
 
 @Entity
 @Table(name = "daily_quote_record")
@@ -27,6 +29,7 @@ public class DailyQuoteRecord extends GenericEntity<Long> {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="quote_pk_generator")
 	private Long id;
 	
+	@Index(name = "quote_date_ix")
 	@Column(name = "add_date")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date date;

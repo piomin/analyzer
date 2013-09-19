@@ -5,8 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import pl.stock.data.entity.User;
-import pl.stock.data.service.UserService;
+import pl.piomin.core.data.model.User;
+import pl.piomin.core.data.service.UserService;
 
 @Controller
 @RequestMapping("user")

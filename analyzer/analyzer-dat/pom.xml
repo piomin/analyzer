@@ -11,11 +11,20 @@
 
 	<artifactId>analyzer-dat</artifactId>
 
+	<properties>
+		<hibernate.version>4.1.9.Final</hibernate.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>4.1.6.Final</version>
+			<version>${hibernate.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>cglib</groupId>
@@ -36,93 +45,18 @@
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>9.0-801.jdbc4</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>pl.piomin.core</groupId>
+			<artifactId>pm-core-data</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>sql-maven-plugin</artifactId>
-				<version>1.5</version>
-				<dependencies>
-					<dependency>
-						<groupId>postgresql</groupId>
-						<artifactId>postgresql</artifactId>
-						<version>9.0-801.jdbc4</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<driver>org.postgresql.Driver</driver>
-					<url>jdbc:postgresql:stockgpw</url>
-					<username>stockgpw</username>
-					<password>stockgpw</password>
-				</configuration>
-				<executions>
-					<execution>
-						<id>drop-db-before-test-if-any</id>
-						<phase>process-test-resources</phase>
-						<goals>
-							<goal>execute</goal>
-						</goals>
-						<configuration>
-							<url>jdbc:postgresql:postgres</url>
-							<autocommit>true</autocommit>
-							<sqlCommand>DROP DATABASE stockgpw</sqlCommand>
-							<onError>continue</onError>
-						</configuration>
-					</execution>
-					<execution>
-						<id>create-db</id>
-						<phase>process-test-resources</phase>
-						<goals>
-							<goal>execute</goal>
-						</goals>
-						<configuration>
-							<url>jdbc:postgresql:postgres</url>
-							<autocommit>true</autocommit>
-							<sqlCommand>CREATE DATABASE stockgpw WITH OWNER = stockgpw ENCODING = 'UTF8' TABLESPACE = stockgpw</sqlCommand>
-						</configuration>
-					</execution>
-					<execution>
-						<id>create-schema</id>
-						<phase>process-test-resources</phase>
-						<goals>
-							<goal>execute</goal>
-						</goals>
-						<configuration>
-							<autocommit>true</autocommit>
-							<onError>continue</onError>
-							<srcFiles>
-								<srcFile>src/main/resources/pl/stock/data/create-schema-stock-data.sql</srcFile>
-							</srcFiles>
-							<onError>continue</onError>
-						</configuration>
-					</execution>
-					<execution>
-						<id>insert-data</id>
-						<phase>process-test-resources</phase>
-						<goals>
-							<goal>execute</goal>
-						</goals>
-						<configuration>
-							<autocommit>true</autocommit>
-							<orderFile>ascending</orderFile>
-							<delimiter>;</delimiter>
-							<delimiterType>normal</delimiterType>
-							<onError>continue</onError>
-							<keepFormat>false</keepFormat>
-							<fileset>
-								<basedir>src/test/resources/pl/stock/data/core</basedir>
-								<includes>
-									<include>**/*.sql</include>
-								</includes>
-							</fileset>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-	
+	<repositories>
+		<repository>
+			<id>github-snapshots</id>
+			<url>https://github.com/piomin/pm-mvn-repo/raw/master</url>
+		</repository>
+	</repositories>
 </project>

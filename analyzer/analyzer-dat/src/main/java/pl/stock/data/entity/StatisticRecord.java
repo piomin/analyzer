@@ -14,7 +14,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import pl.stock.data.core.GenericEntity;
+import pl.piomin.core.data.generic.GenericEntity;
 
 @Entity
 @Table(name = "statistic_record")

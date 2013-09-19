@@ -90,6 +90,6 @@ public abstract class QuotesFileParser {
 	 * @return - list of output records
 	 * @throws ParseException
 	 */
-	public abstract List<DailyQuoteRecord> parse(File file) throws ParseException, IOException;
+	public abstract Object parse(File file) throws ParseException, IOException;
 	
 }

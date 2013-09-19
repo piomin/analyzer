@@ -18,5 +18,5 @@
 	<mvc:annotation-driven />
 	
 	<context:component-scan base-package="pl.stock.web" />
-	
+	<context:component-scan base-package="pl.piomin.core.data" />
 </beans>

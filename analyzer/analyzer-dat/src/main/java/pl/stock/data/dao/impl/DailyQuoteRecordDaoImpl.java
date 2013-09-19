@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import pl.stock.data.core.GenericDaoImpl;
+import pl.piomin.core.data.generic.GenericDaoImpl;
 import pl.stock.data.dao.DailyQuoteRecordDao;
 import pl.stock.data.entity.Company;
 import pl.stock.data.entity.DailyQuoteRecord;
@@ -18,30 +18,30 @@ import pl.stock.data.entity.DailyQuoteRecord;
 public class DailyQuoteRecordDaoImpl extends GenericDaoImpl<Long, DailyQuoteRecord> implements DailyQuoteRecordDao {
 
 	public DailyQuoteRecordDaoImpl() {
-		setEntityClass(DailyQuoteRecord.class);
+		super(DailyQuoteRecord.class);
 	}
 	
 	public DailyQuoteRecord findLastByCompany(Company company) {
-		return (DailyQuoteRecord) this.getCurrentSession()
+		return (DailyQuoteRecord) this.getSessionFactory().getCurrentSession()
 				.createQuery("select a from DailyQuoteRecord a left join fetch a.statistic c where a.id = (select max(id) from DailyQuoteRecord b where b.company = :company)").setEntity("company", company)
 				.uniqueResult();
 	}
 
 	public int countByCompany(Company company) {
-		return ((Long) this.getCurrentSession().createQuery("select count(id) from DailyQuoteRecord a where a.company = :company").setEntity("company", company).uniqueResult())
+		return ((Long) this.getSessionFactory().getCurrentSession().createQuery("select count(id) from DailyQuoteRecord a where a.company = :company").setEntity("company", company).uniqueResult())
 				.intValue();
 	}
 	
 	@SuppressWarnings("unchecked")
 	public List<DailyQuoteRecord> findByCompany(Company company, int maxCount) {
 		final String query = "select r from DailyQuoteRecord r where r.company = :company order by r.date desc";
-		return this.getCurrentSession().createQuery(query).setEntity("company", company).setMaxResults(maxCount).list();
+		return this.getSessionFactory().getCurrentSession().createQuery(query).setEntity("company", company).setMaxResults(maxCount).list();
 	}
 	
 	@SuppressWarnings("unchecked")
 	public List<DailyQuoteRecord> findAllByCompany(Company company) {
 		final String query = "select r from DailyQuoteRecord r where r.company = :company order by r.date desc";
-		return this.getCurrentSession().createQuery(query).setEntity("company", company).list();
+		return this.getSessionFactory().getCurrentSession().createQuery(query).setEntity("company", company).list();
 	}
 	
 }

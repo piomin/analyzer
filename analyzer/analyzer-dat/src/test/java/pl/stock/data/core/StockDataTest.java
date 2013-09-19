@@ -123,8 +123,8 @@ public class StockDataTest {
 		LOGGER.info("StatisticRecord found -> " + statistic.getShortInfo());
 		
 		// test update history service count() method
-		final int count = updateService.count();
-		LOGGER.info("UpdateHistory count -> " + count);
+//		final int count = updateService.count();
+//		LOGGER.info("UpdateHistory count -> " + count);
 		
 		// test daily quote record service findByCompany() method 
 		quote = quoteService.findLastByCompany(company);

@@ -57,9 +57,12 @@ public class MACD {
 		}
 		
 		// count main MACD-s EMA table
-		final double[] signals = new double[actualMacds.length - periodSignal];
-		if (actualMacds.length >= 9) {
-			emaSignal.count(actualMacds, 0, signals);
+		double[] signals = new double[0];
+		if (actualMacds.length > periodSignal) {
+			signals = new double[actualMacds.length - periodSignal];
+  		if (actualMacds.length >= 9) {
+  			emaSignal.count(actualMacds, 0, signals);
+  		}
 		}
 		
 		// fill return table - (0) MACD, (1) EMA MACD

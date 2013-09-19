@@ -9,7 +9,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
-import pl.stock.data.core.GenericEntity;
+import org.hibernate.annotations.Index;
+
+import pl.piomin.core.data.generic.GenericEntity;
 
 @Entity
 public class Company extends GenericEntity<Integer> {
@@ -23,6 +25,7 @@ public class Company extends GenericEntity<Integer> {
 	private String name;
 	
 	@Column
+	@Index(name = "company_symbol_ix")
 	private String symbol;
 
 	public Company() {

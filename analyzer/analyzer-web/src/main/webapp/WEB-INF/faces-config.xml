@@ -4,14 +4,7 @@
     xmlns="http://java.sun.com/xml/ns/javaee"
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd" >
 
-<!--     <lifecycle> -->
-<!-- com.liferay.faces.util.lifecycle.DebugPhaseListener -->
-<!--     </lifecycle> -->
-
     <application>
-	    <el-resolver>
-	        org.springframework.web.jsf.el.SpringBeanFacesELResolver
-	    </el-resolver>
 	    <locale-config>
 	    	<default-locale>pl_PL</default-locale>
 	    	<supported-locale>en_GB</supported-locale>

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import pl.stock.data.core.GenericServiceImpl;
+import pl.piomin.core.data.generic.GenericServiceImpl;
 import pl.stock.data.dao.DailyQuoteRecordDao;
 import pl.stock.data.entity.Company;
 import pl.stock.data.entity.DailyQuoteRecord;

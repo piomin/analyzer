@@ -2,7 +2,7 @@ package pl.stock.data.dao;
 
 import java.util.List;
 
-import pl.stock.data.core.GenericDao;
+import pl.piomin.core.data.generic.GenericDao;
 import pl.stock.data.entity.Company;
 import pl.stock.data.entity.DailyQuoteRecord;
 

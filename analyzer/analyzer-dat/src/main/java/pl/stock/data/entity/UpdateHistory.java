@@ -14,8 +14,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import pl.piomin.core.data.generic.GenericEntity;
 import pl.stock.data.beans.UpdateStatus;
-import pl.stock.data.core.GenericEntity;
 
 @Entity
 @Table(name = "update_history")

@@ -6,10 +6,12 @@ public class StatisticRecordSimple {
 
 	private double rsi;
 	private double adx;
+	private double sts;
 	private SignalStatus ema50Status;
 	private SignalStatus macdStatus;
 	private SignalStatus dmiStatus;
 	private String companySymbol;
+	private Integer companyId;
 
 	public double getRsi() {
 		return rsi;
@@ -25,6 +27,14 @@ public class StatisticRecordSimple {
 
 	public void setAdx(double adx) {
 		this.adx = adx;
+	}
+
+	public double getSts() {
+		return sts;
+	}
+
+	public void setSts(double sts) {
+		this.sts = sts;
 	}
 
 	public SignalStatus getEma50Status() {
@@ -57,6 +67,14 @@ public class StatisticRecordSimple {
 
 	public void setCompanySymbol(String companySymbol) {
 		this.companySymbol = companySymbol;
+	}
+
+	public Integer getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(Integer companyId) {
+		this.companyId = companyId;
 	}
 
 }

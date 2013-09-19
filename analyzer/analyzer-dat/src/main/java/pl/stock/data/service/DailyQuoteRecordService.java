@@ -2,7 +2,7 @@ package pl.stock.data.service;
 
 import java.util.List;
 
-import pl.stock.data.core.GenericService;
+import pl.piomin.core.data.generic.GenericService;
 import pl.stock.data.entity.Company;
 import pl.stock.data.entity.DailyQuoteRecord;
 

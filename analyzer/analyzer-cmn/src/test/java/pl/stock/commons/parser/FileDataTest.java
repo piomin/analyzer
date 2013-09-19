@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -54,7 +55,7 @@ public class FileDataTest {
 		URL url = new URL("http://bossa.pl/pub/metastock/mstock/mstall.zip");
 		File temp = File.createTempFile("_daily", ".temp");
 		FileUtils.copyURLToFile(url, temp);
-		List<DailyQuoteRecord> records = multiParser.parse(temp);
+		Map<String, List<DailyQuoteRecord>> records = multiParser.parse(temp);
 		LOGGER.info("Records read -> " + records.size());
 	}
 	

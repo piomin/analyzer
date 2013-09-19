@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import pl.stock.data.core.GenericServiceImpl;
+import pl.piomin.core.data.generic.GenericServiceImpl;
 import pl.stock.data.dao.StatisticRecordDao;
 import pl.stock.data.entity.DailyQuoteRecord;
 import pl.stock.data.entity.StatisticRecord;
@@ -35,6 +35,11 @@ public class StatisticRecordServiceImpl extends GenericServiceImpl<Long, Statist
 	@Override
 	public List<StatisticRecord> findByDatePeriod(Date from, Date to) {
 		return ((StatisticRecordDao) this.dao).findByDatePeriod(from, to);
+	}
+
+	@Override
+	public List<StatisticRecord> findByDateAndIds(Date from, Date to, Integer[] companyIds) {
+		return ((StatisticRecordDao) this.dao).findByDateAndIds(from, to, companyIds);
 	}
 	
 }
