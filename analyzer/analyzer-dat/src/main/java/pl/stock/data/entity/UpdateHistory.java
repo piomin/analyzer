@@ -16,6 +16,7 @@ import javax.persistence.TemporalType;
 
 import pl.piomin.core.data.generic.GenericEntity;
 import pl.stock.data.beans.UpdateStatus;
+import pl.stock.data.beans.UpdateType;
 
 @Entity
 @Table(name = "update_history")
@@ -34,6 +35,10 @@ public class UpdateHistory extends GenericEntity<Integer> {
 	@Enumerated(EnumType.ORDINAL)
 	private UpdateStatus status;
 
+	@Column
+	@Enumerated(EnumType.ORDINAL)
+	private UpdateType type;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -56,6 +61,14 @@ public class UpdateHistory extends GenericEntity<Integer> {
 
 	public void setStatus(UpdateStatus status) {
 		this.status = status;
+	}
+
+	public UpdateType getType() {
+		return type;
+	}
+
+	public void setType(UpdateType type) {
+		this.type = type;
 	}
 
 	@Override

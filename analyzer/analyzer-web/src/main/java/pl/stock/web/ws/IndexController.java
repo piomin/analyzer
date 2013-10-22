@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import pl.stock.data.entity.StockIndex;
 import pl.stock.data.service.StockIndexService;
+import pl.stock.logic.service.ConversionService;
 import pl.stock.web.ws.protocol.Response;
 import pl.stock.web.ws.service.ResponseProducerService;
 
@@ -25,13 +26,15 @@ public class IndexController {
 	private StockIndexService indexService;
 	@Autowired
 	private ResponseProducerService responseService;
+	@Autowired
+	private ConversionService conversionService;
 
 	@RequestMapping("list")
 	@ResponseBody
 	public Response getList() {
 		LOG.debug("GET list");
 		List<StockIndex> indices = indexService.loadAll();
-		return responseService.createListResponse(indices);
+		return responseService.createListResponse(conversionService.createStockIndexDTOs(indices));
 	}
 	
 }

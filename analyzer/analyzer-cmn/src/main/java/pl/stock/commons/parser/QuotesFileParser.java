@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.springframework.format.datetime.DateFormatter;
@@ -36,7 +37,7 @@ public abstract class QuotesFileParser {
 	 * @return - list with DailyQuoteRecord objects
 	 * @throws ParseException - error while parsing file
 	 */
-	protected List<DailyQuoteRecord> translateLines(final List<String> lines) throws ParseException {
+	protected List<DailyQuoteRecord> translateLines(final List<String> lines, final Pattern blacklist) throws ParseException {
 		
 		// return list with daily quote records
 		final List<DailyQuoteRecord> records = new ArrayList<DailyQuoteRecord>();
@@ -47,7 +48,9 @@ public abstract class QuotesFileParser {
 			final DailyQuoteRecord record = parseLine(line);
 			
 			// add created daily record to the returned list
-			records.add(record);
+			if (!blacklist.matcher(record.getCompany().getSymbol()).matches()) {
+				records.add(record);
+			}
 		}
 		
 		return records;
@@ -90,6 +93,6 @@ public abstract class QuotesFileParser {
 	 * @return - list of output records
 	 * @throws ParseException
 	 */
-	public abstract Object parse(File file) throws ParseException, IOException;
+	public abstract Object parse(File file, Pattern blacklist) throws ParseException, IOException;
 	
 }

@@ -85,8 +85,9 @@ public class STS {
 	public double[] single(double[] closes, double[] mins, double[] maxs, double previousStsSlow) {
 		
 		// count STS table for requested period
-		final double[] ks = new double[period]; 
-		for (int i = 0; i < period; i++) {
+		final int ksLength = closes.length - period + 1;
+		final double[] ks = new double[ksLength]; 
+		for (int i = 0; i < ksLength; i++) {
 			final double min = StatUtils.min(mins, i, period);
 			final double max = StatUtils.max(maxs, i, period);
 			ks[i] = 100 * (closes[i] - min) / (max - min);

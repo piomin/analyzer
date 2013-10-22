@@ -26,6 +26,7 @@ import pl.stock.data.service.DailyQuoteRecordService;
 import pl.stock.data.service.StatisticRecordService;
 import pl.stock.data.service.StockIndexService;
 import pl.stock.data.service.UpdateHistoryService;
+import pl.stock.logic.enums.UpdateType;
 
 @Service
 @Transactional(readOnly = false)
@@ -54,7 +55,7 @@ public class StockLogicService {
 	 * Process daily file update schedule
 	 * @param records - list of records read from file
 	 */
-	public void processQuoteUpdate(final List<DailyQuoteRecord> records, boolean finished) {
+	public void processQuoteUpdate(final List<DailyQuoteRecord> records, final pl.stock.data.beans.UpdateType type, boolean finished) {
 
 		// number of records added
 		tasksInProgress++;
@@ -69,18 +70,22 @@ public class StockLogicService {
 				company = new Company(symbol, symbol);
 				Integer id = companyService.add(company);
 				company.setId(id);
-				LOGGER.debug(MessageFormat.format("{0} | Company {1} added", symbol, company.getId()));
+				LOGGER.info(MessageFormat.format("{0} | Company {1} added", symbol, company.getId()));
+				if (type == pl.stock.data.beans.UpdateType.FUNDS) {
+					StockIndex index = indexService.findByName("FUNDUSZE");
+					index.getCompanies().add(company);
+				}
 			}
 			record.setCompany(company);
 
 			// save daily quote record in database
 			final Long recordId = quoteService.add(record);
-			LOGGER.debug(MessageFormat.format("{0} | Daily quote {1} added", symbol, recordId));
+			LOGGER.info(MessageFormat.format("{0} | Daily quote {1} added", symbol, recordId));
 		}
 
 		// save information about update status in database if all data imported
 		if (finished) {
-			saveUpdate();
+			saveUpdate(type);
 		} else {
 			tasksInProgress--;
 		}
@@ -88,32 +93,36 @@ public class StockLogicService {
 	}
 
 	/**
-	 * Check if it is initial update
-	 * @return - true if it is initial update
+	 * Detect update type. Possible values are NONE, TICKLY, DAILY, MULTI, INITIAL
+	 * @return - update type
 	 */
-	public boolean checkIfInitialUpdate() {
-		if (updateService.count() == 0) {
-			return true;
+	public UpdateType detectUpdateType(pl.stock.data.beans.UpdateType type) {
+		if (updateService.countByType(type) == 0) {
+			return UpdateType.INITIAL;
 		} else {
-			return false;
-		}
-	}
+			// set today calendar
+			final Calendar today = GregorianCalendar.getInstance();
+			today.setTime(new Date());
 
-	/**
-	 * Check if update was performed today
-	 * @return
-	 */
-	public boolean checkIfUpdatePerformed() {
-		UpdateHistory update = updateService.findNewest();
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.setTime(update.getAddDate());
-		Calendar today = GregorianCalendar.getInstance();
-		today.setTime(new Date());
-		if (today.get(Calendar.DAY_OF_YEAR) == calendar.get(Calendar.DAY_OF_YEAR) || today.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY
-				|| today.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-			return true;
-		} else {
-			return false;
+			// on Saturday and Sunday update is not performed	
+			final int dayOfWeek = today.get(Calendar.DAY_OF_WEEK);
+			if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
+				return UpdateType.NONE;
+			}
+
+			// find update and set update date calendar
+			final UpdateHistory updateHistory = updateService.findNewestByType(type);
+			final Calendar update = GregorianCalendar.getInstance();
+			update.setTime(updateHistory.getAddDate());
+			final int todayDayOfYear = today.get(Calendar.DAY_OF_YEAR);
+			final int updateDayOfYear = update.get(Calendar.DAY_OF_YEAR);
+			if (todayDayOfYear == updateDayOfYear) {
+				return UpdateType.TICKLY;
+			} else if (updateDayOfYear == (todayDayOfYear - 1) || (updateDayOfYear == (todayDayOfYear - 3) && dayOfWeek == Calendar.MONDAY)) {
+				return UpdateType.DAILY;
+			} else {
+				return UpdateType.MULTI;
+			}
 		}
 	}
 
@@ -122,23 +131,25 @@ public class StockLogicService {
 	}
 
 	/**
-	 * Process daily statistic calculation for all companies
+	 * Process daily statistic calculation for company
+	 * @param companySymbol
+	 * @param date
 	 */
-	public void processDailyCalculation() {
+	public void processDailyCalculation(String companySymbol, Date date) {
+		// find company by symbol
+		final Company company = companyService.findBySymbol(companySymbol);
 
-		// load all actual companies from database
-		final List<Company> companies = (List<Company>) companyService.loadAll();
+		// find daily quote history and last statistic record from database
+		final List<DailyQuoteRecord> quotes = quoteService.findByCompanyOlderThan(company, date, 100);
+		if (quotes.size() < 2) {
+			LOGGER.warn(MessageFormat.format("{0} | No qoutes found", companySymbol));
+			return;
+		}
+		final DailyQuoteRecord lastQuote = quotes.get(0);
 
-		// getting today date
-		final Date today = new Date();
-
-		// iterate over all companies
-		for (Company company : companies) {
-
-			// find daily quote history and last statistic record from database
-			List<DailyQuoteRecord> quotes = quoteService.findByCompany(company, 100);
-			DailyQuoteRecord lastQuote = quotes.get(0);
-			StatisticRecord previousStatistic = quotes.get(1).getStatistic();
+		// count new statistic only if it does not exist
+		if (lastQuote.getStatistic() == null) {
+			final StatisticRecord previousStatistic = quotes.get(1).getStatistic();
 
 			// initialize table with daily quote values history
 			final int prizesLength = quotes.size();
@@ -157,7 +168,8 @@ public class StockLogicService {
 			// creating statistic record
 			final StatisticRecord actualStatistic = new StatisticRecord();
 			actualStatistic.setQuote(lastQuote);
-			actualStatistic.setAddDate(today);
+			actualStatistic.setCompany(company);
+			actualStatistic.setAddDate(date);
 
 			// set number of quotes found in database
 			calculationService.setQuoteCount(prizesLength);
@@ -213,7 +225,7 @@ public class StockLogicService {
 	 * Calculate and store statistics from the beginning to current date for company
 	 * @param companySymbol
 	 */
-	public void processCalculationForCompany(String companySymbol) {
+	public void processInitialCalculation(String companySymbol) {
 		Company company = companyService.findBySymbol(companySymbol);
 		try {
 			// find daily quote history and last statistic record from database
@@ -281,6 +293,8 @@ public class StockLogicService {
 			final double[] stss = stsRet[0];
 			final double[] stssEma = stsRet[1];
 
+			LOGGER.debug(MessageFormat.format("{0} | Statistics calculated", company.getSymbol()));
+			
 			// iterate over all quotes starting from oldest, count from
 			// sixth quote because this is EMA 5 first count
 			int startIndex = closes.length - 6;
@@ -289,6 +303,7 @@ public class StockLogicService {
 				DailyQuoteRecord quote = quotes.get(i);
 				StatisticRecord statistic = new StatisticRecord();
 				statistic.setQuote(quote);
+				statistic.setCompany(company);
 
 				if (emas5.length > i) {
 					statistic.setEma5(emas5[i]);
@@ -371,7 +386,7 @@ public class StockLogicService {
 
 				statistic.setAddDate(new Date());
 				final Long statisticId = statisticService.add(statistic);
-				LOGGER.debug(MessageFormat.format("{0} | Statistic {1} added", company.getSymbol(), statisticId));
+				LOGGER.info(MessageFormat.format("{0} | Statistic {1} added", company.getSymbol(), statisticId));
 			}
 
 		} catch (Exception e) {
@@ -425,7 +440,7 @@ public class StockLogicService {
 		// convert result
 		return getStatisticList(date, ids);
 	}
-	
+
 	/**
 	 * Get statistic for company from requested period
 	 * @param date - quote date
@@ -436,7 +451,7 @@ public class StockLogicService {
 		// collect data
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.setTime(date);
-		calendar.add(Calendar.DAY_OF_YEAR, -10);
+		calendar.add(Calendar.DAY_OF_YEAR, -30);
 		Company company = companyService.load(companyId);
 		DailyQuoteRecord quote = quoteService.findLastByCompany(company);
 		List<StatisticRecord> stats = statisticService.findByDateAndIds(calendar.getTime(), date, new Integer[] { companyId });
@@ -451,12 +466,34 @@ public class StockLogicService {
 	/**
 	 * Store update information with current date
 	 */
-	public void saveUpdate() {
+	public void saveUpdate(final pl.stock.data.beans.UpdateType type) {
 		final UpdateHistory history = new UpdateHistory();
 		history.setAddDate(new Date());
 		history.setStatus(UpdateStatus.SUCCESS);
+		history.setType(type);
 		final Integer id = updateService.add(history);
 		LOGGER.info(MessageFormat.format("Update {0} added", id));
+	}
+
+	/**
+	 * Add new index with name
+	 * @param name
+	 */
+	public void createIndexIfNotExists(final String name) {
+		if (indexService.findByName(name) == null) {
+  		final StockIndex index = new StockIndex();
+  		index.setName(name);
+  		final Integer id = indexService.add(index);
+  		LOGGER.info(MessageFormat.format("Index {0} added", id));
+		}
+	}
+	
+	/**
+	 * Return last update add date
+	 * @return
+	 */
+	public Date getLastUpDate() {
+		return updateService.findNewest().getAddDate();
 	}
 
 	/**
@@ -468,7 +505,7 @@ public class StockLogicService {
 		// get 10 days before requested date for statistic calculation
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.setTime(date);
-		calendar.add(Calendar.DAY_OF_YEAR, -10);
+		calendar.add(Calendar.DAY_OF_YEAR, -30);
 
 		// collect data, all records or filtered by parameter
 		List<StatisticRecordSimple> result = new ArrayList<>();
@@ -478,7 +515,7 @@ public class StockLogicService {
 		} else {
 			statistics = statisticService.findByDatePeriod(calendar.getTime(), date);
 		}
-		
+
 		// convert result
 		Company company = statistics.get(0).getQuote().getCompany();
 		List<StatisticRecord> companyStats = new ArrayList<>();

@@ -29,6 +29,10 @@ public class StatisticRecord extends GenericEntity<Long> {
 	@JoinColumn(name = "quote_id")
 	private DailyQuoteRecord quote;
 	
+	@OneToOne
+	@JoinColumn(name = "company_id")
+	private Company company;
+	
 	@Column
 	private double rsi;
 	
@@ -125,6 +129,14 @@ public class StatisticRecord extends GenericEntity<Long> {
 
 	public void setQuote(DailyQuoteRecord quote) {
 		this.quote = quote;
+	}
+
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
 	}
 
 	public double getRsi() {

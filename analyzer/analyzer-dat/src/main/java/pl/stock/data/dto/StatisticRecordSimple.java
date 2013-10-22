@@ -4,14 +4,29 @@ import pl.stock.data.beans.SignalStatus;
 
 public class StatisticRecordSimple {
 
+	private double prize;
 	private double rsi;
 	private double adx;
 	private double sts;
-	private SignalStatus ema50Status;
+	private double roc;
+	private double atr;
+	private double atrPercentage;
+	private double[] volumens;
+	private double[] prizeChanges;
+	private SignalStatus[] emasStatus;
+	private double[] emasPercentage;
 	private SignalStatus macdStatus;
 	private SignalStatus dmiStatus;
 	private String companySymbol;
 	private Integer companyId;
+
+	public double getPrize() {
+		return prize;
+	}
+
+	public void setPrize(double prize) {
+		this.prize = prize;
+	}
 
 	public double getRsi() {
 		return rsi;
@@ -37,12 +52,76 @@ public class StatisticRecordSimple {
 		this.sts = sts;
 	}
 
-	public SignalStatus getEma50Status() {
-		return ema50Status;
+	public double getRoc() {
+		return roc;
 	}
 
-	public void setEma50Status(SignalStatus ema50Status) {
-		this.ema50Status = ema50Status;
+	public void setRoc(double roc) {
+		this.roc = roc;
+	}
+
+	public double getAtr() {
+		return atr;
+	}
+
+	public void setAtr(double atr) {
+		this.atr = atr;
+	}
+
+	public double getAtrPercentage() {
+		return atrPercentage;
+	}
+
+	public void setAtrPercentage(double atrPercentage) {
+		this.atrPercentage = atrPercentage;
+	}
+
+	public double[] getVolumens() {
+		return volumens;
+	}
+
+	public void setVolumens(double[] volumens) {
+		this.volumens = volumens;
+	}
+
+	public void addVolumen(int i, double volumen) {
+		this.volumens[i] = volumen;
+	}
+
+	public double[] getPrizeChanges() {
+		return prizeChanges;
+	}
+
+	public void setPrizeChanges(double[] prizeChanges) {
+		this.prizeChanges = prizeChanges;
+	}
+
+	public void addPrizeChange(int i, double prize) {
+		this.prizeChanges[i] = prize;
+	}
+
+	public SignalStatus[] getEmasStatus() {
+		return emasStatus;
+	}
+
+	public void setEmasStatus(SignalStatus[] emasStatus) {
+		this.emasStatus = emasStatus;
+	}
+
+	public void addEmaStatus(int i, SignalStatus status) {
+		this.emasStatus[i] = status;
+	}
+
+	public double[] getEmasPercentage() {
+		return emasPercentage;
+	}
+
+	public void setEmasPercentage(double[] emasValue) {
+		this.emasPercentage = emasValue;
+	}
+
+	public void addEmaPercentage(int i, double emaValue) {
+		this.emasPercentage[i] = emaValue;
 	}
 
 	public SignalStatus getMacdStatus() {

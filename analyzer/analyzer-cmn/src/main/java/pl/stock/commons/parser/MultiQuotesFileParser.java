@@ -10,6 +10,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -27,7 +28,7 @@ import pl.stock.data.entity.DailyQuoteRecord;
 public class MultiQuotesFileParser extends QuotesFileParser {
 
 	@Override
-	public Map<String, List<DailyQuoteRecord>> parse(File file) throws ParseException, IOException {
+	public Map<String, List<DailyQuoteRecord>> parse(File file, Pattern blacklist) throws ParseException, IOException {
 
 		// creating ZIP handle for input file
 		final ZipFile zip = new ZipFile(file);
@@ -44,14 +45,17 @@ public class MultiQuotesFileParser extends QuotesFileParser {
 				final ZipEntry entry = entries.nextElement();
 				stream = zip.getInputStream(entry);
 
-				// reading file lines, removing title line and translating into DailyQuoteRecord object in loop
-				final List<String> lines = IOUtils.readLines(stream);
-				final String titleLine = lines.remove(0);
-				LOGGER.debug(MessageFormat.format("Title line {0} removed.", titleLine));
-				records.put(entry.getName().substring(0, entry.getName().length() - 4), translateLines(lines));
+				final String company = entry.getName().substring(0, entry.getName().length() - 4);
+				if (!blacklist.matcher(company).matches()) {
+					// reading file lines, removing title line and translating into DailyQuoteRecord object in loop
+					final List<String> lines = IOUtils.readLines(stream);
+					final String titleLine = lines.remove(0);
+					LOGGER.debug(MessageFormat.format("Title line {0} removed.", titleLine));
+					records.put(company, translateLines(lines, blacklist));
 
-				// finished entry log
-				LOGGER.info(MessageFormat.format("Zip entry {0} translated.", entry.getName()));
+					// finished entry log
+					LOGGER.info(MessageFormat.format("Zip entry {0} translated.", entry.getName()));
+				}
 			} catch (FileNotFoundException e) {
 				LOGGER.error("", e);
 			} catch (IOException e) {

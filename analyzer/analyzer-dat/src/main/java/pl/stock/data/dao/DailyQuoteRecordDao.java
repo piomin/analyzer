@@ -1,5 +1,6 @@
 package pl.stock.data.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import pl.piomin.core.data.generic.GenericDao;
@@ -36,5 +37,14 @@ public interface DailyQuoteRecordDao extends GenericDao<Long, DailyQuoteRecord> 
 	 * @return - list of quote entity
 	 */
 	List<DailyQuoteRecord> findAllByCompany(Company company);
+	
+	/**
+	 * Find maxCount quotes earlier than maxDate
+	 * @param company
+	 * @param maxDate
+	 * @param maxCount
+	 * @return
+	 */
+	List<DailyQuoteRecord> findByCompanyOlderThan(Company company, Date maxDate, int maxCount);
 	
 }

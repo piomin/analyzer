@@ -65,12 +65,12 @@ public class StatisticController {
 		}
 	}
 	
-	@RequestMapping("group/{date}/{name}")
+	@RequestMapping("group/{date}/{id}")
 	@ResponseBody
-	public Response getListByDateAndGroup(@PathVariable String date, @PathVariable String groupId) {
-		LOG.debug(MessageFormat.format("GET group/{0}/{1}", date, groupId));
+	public Response getListByDateAndGroup(@PathVariable String date, @PathVariable String id) {
+		LOG.debug(MessageFormat.format("GET group/{0}/{1}", date, id));
 		try {
-			List<StatisticRecordSimple> statistics = logicService.processGroupRequest(DF.parse(date, LOC), Integer.valueOf(groupId));
+			List<StatisticRecordSimple> statistics = logicService.processGroupRequest(DF.parse(date, LOC), Integer.valueOf(id));
 			return responseService.createListResponse(statistics);
 		} catch (ParseException e) {
 			LOG.error("Error parsing input", e);

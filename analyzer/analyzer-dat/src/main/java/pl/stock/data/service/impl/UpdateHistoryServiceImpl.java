@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import pl.piomin.core.data.generic.GenericServiceImpl;
+import pl.stock.data.beans.UpdateType;
 import pl.stock.data.dao.UpdateHistoryDao;
 import pl.stock.data.entity.UpdateHistory;
 import pl.stock.data.service.UpdateHistoryService;
@@ -21,6 +22,16 @@ public class UpdateHistoryServiceImpl extends GenericServiceImpl<Integer, Update
 	@Override
 	public UpdateHistory findNewest() {
 		return ((UpdateHistoryDao) this.dao).findNewest();
+	}
+
+	@Override
+	public UpdateHistory findNewestByType(UpdateType type) {
+		return ((UpdateHistoryDao) this.dao).findNewestByType(type);
+	}
+
+	@Override
+	public int countByType(UpdateType type) {
+		return ((UpdateHistoryDao) this.dao).countByType(type);
 	}
 
 }

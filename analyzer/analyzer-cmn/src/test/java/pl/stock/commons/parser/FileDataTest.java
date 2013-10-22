@@ -6,6 +6,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -28,7 +29,7 @@ public class FileDataTest {
 	
 	// multiple days quote file parser object
 	private MultiQuotesFileParser multiParser = new MultiQuotesFileParser();
-	
+	private String blacklist = "(WIG|DB|GN|RC|UC|BPH|INV|OPERA|ARK|ETF|LM|PKO|MWIG|SWIG).*";
 	
 	/**
 	 * Test if downloading file with daily quotes works
@@ -40,7 +41,8 @@ public class FileDataTest {
 		URL url = new URL("http://bossa.pl/pub/metastock/mstock/sesjaall/sesjaall.prn");
 		File temp = File.createTempFile("_daily", ".temp");
 		FileUtils.copyURLToFile(url, temp);
-		List<DailyQuoteRecord> records = parser.parse(temp);
+		Pattern blacklistPattern = Pattern.compile(blacklist);
+		List<DailyQuoteRecord> records = parser.parse(temp, blacklistPattern);
 		LOGGER.info("Records read -> " + records.size());
 	}
 	
@@ -55,7 +57,8 @@ public class FileDataTest {
 		URL url = new URL("http://bossa.pl/pub/metastock/mstock/mstall.zip");
 		File temp = File.createTempFile("_daily", ".temp");
 		FileUtils.copyURLToFile(url, temp);
-		Map<String, List<DailyQuoteRecord>> records = multiParser.parse(temp);
+		Pattern blacklistPattern = Pattern.compile(blacklist);
+		Map<String, List<DailyQuoteRecord>> records = multiParser.parse(temp, blacklistPattern);
 		LOGGER.info("Records read -> " + records.size());
 	}
 	

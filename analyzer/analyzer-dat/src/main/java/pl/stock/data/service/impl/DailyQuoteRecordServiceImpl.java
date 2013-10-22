@@ -1,5 +1,6 @@
 package pl.stock.data.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,11 @@ public class DailyQuoteRecordServiceImpl extends GenericServiceImpl<Long, DailyQ
 	@Override
 	public List<DailyQuoteRecord> findAllByCompany(Company company) {
 		return ((DailyQuoteRecordDao) this.dao).findAllByCompany(company);
+	}
+
+	@Override
+	public List<DailyQuoteRecord> findByCompanyOlderThan(Company company, Date maxDate, int maxCount) {
+		return ((DailyQuoteRecordDao) this.dao).findByCompanyOlderThan(company, maxDate, maxCount);
 	}
 	
 }

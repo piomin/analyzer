@@ -36,7 +36,7 @@ public class DownloadIndicesListScheduler {
 	@Autowired
 	private UpdateHistoryService updateService;
 
-	@Scheduled(cron = "*/60 * * * * ?")
+	@Scheduled(cron = "0 0 */1 * * ?")
 	public void schedule() {
 
 		// do not process if there is no update
@@ -44,6 +44,8 @@ public class DownloadIndicesListScheduler {
 			return;
 		}
 
+		LOGGER.info("Updating indices");
+		
 		// import all indices list
 		try {
 			List<String> indices = getAllIndices();

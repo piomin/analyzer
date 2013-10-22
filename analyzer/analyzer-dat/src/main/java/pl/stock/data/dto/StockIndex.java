@@ -13,6 +13,11 @@ public class StockIndex {
 
 	}
 
+	public StockIndex(Integer id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+
 	public StockIndex(pl.stock.data.entity.StockIndex index) {
 		this.id = index.getId();
 		this.name = index.getName();

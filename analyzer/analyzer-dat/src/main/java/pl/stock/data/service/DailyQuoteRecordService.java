@@ -1,5 +1,6 @@
 package pl.stock.data.service;
 
+import java.util.Date;
 import java.util.List;
 
 import pl.piomin.core.data.generic.GenericService;
@@ -15,5 +16,7 @@ public interface DailyQuoteRecordService extends GenericService<Long, DailyQuote
 	List<DailyQuoteRecord> findByCompany(Company company, int maxCount);
 	
 	List<DailyQuoteRecord> findAllByCompany(Company company);
+	
+	List<DailyQuoteRecord> findByCompanyOlderThan(Company company, Date maxDate, int maxCount);
 	
 }

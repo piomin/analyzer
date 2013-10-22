@@ -1,5 +1,7 @@
 package pl.stock.logic.helper;
 
+import java.math.BigDecimal;
+
 import pl.stock.data.beans.SignalStatus;
 
 public final class CalculationHelper {
@@ -15,16 +17,30 @@ public final class CalculationHelper {
 		double diff = positive[0] - negative[0];
 		double prevDiff = positive[1] - negative[1];
 		// check if positive and negative lines intersected
-		if (diff*prevDiff < 0) {
-			if (diff >= 0) return SignalStatus.POSITIVE; // if actual positive is bigger than negative signal is positive
-			else return SignalStatus.NEGATIVE;
+		if (diff * prevDiff < 0) {
+			if (diff >= 0)
+				return SignalStatus.POSITIVE; // if actual positive is bigger than negative signal is positive
+			else
+				return SignalStatus.NEGATIVE;
 		}
 		// check if intersection is close enough to send warning signal
-		if (Math.abs(diff) < Math.abs(prevDiff) && diff/negative[0] < warnRatio) {
-			if (diff > 0) return SignalStatus.WARNING_PLUS;
-			else return SignalStatus.WARNING_MINUS;
+		if (Math.abs(diff) < Math.abs(prevDiff) && diff / negative[0] < warnRatio) {
+			if (diff > 0)
+				return SignalStatus.WARNING_PLUS;
+			else
+				return SignalStatus.WARNING_MINUS;
 		}
 		// there was no signal
 		return SignalStatus.NONE;
+	}
+
+	/**
+	 * Return % difference between two input values (start, end)
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	public static final double countPercentageDiff(double start, double end) {
+		return new BigDecimal(100 * (end - start) / start).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
 }

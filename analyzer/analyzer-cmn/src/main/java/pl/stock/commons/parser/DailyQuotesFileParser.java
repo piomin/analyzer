@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ public class DailyQuotesFileParser extends QuotesFileParser {
 	
 	
 	@Override
-	public List<DailyQuoteRecord> parse(File file) throws ParseException {
+	public List<DailyQuoteRecord> parse(File file, Pattern blacklist) throws ParseException {
 		
 		// file stream handle
 		BufferedInputStream stream = null;
@@ -37,7 +38,7 @@ public class DailyQuotesFileParser extends QuotesFileParser {
 			
 			// reading file lines and translating into DailyQuoteRecord object in loop
 			final List<String> lines = IOUtils.readLines(stream);
-			records = translateLines(lines);
+			records = translateLines(lines, blacklist);
 		} catch (FileNotFoundException e) {
 			LOGGER.error("", e);
 		} catch (IOException e) {

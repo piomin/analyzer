@@ -2,9 +2,13 @@ package pl.stock.logic.scheduler;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import pl.stock.commons.file.DownloadFileUtils;
 import pl.stock.commons.parser.DailyQuotesFileParser;
 import pl.stock.commons.parser.MultiQuotesFileParser;
 import pl.stock.data.entity.DailyQuoteRecord;
+import pl.stock.logic.enums.UpdateType;
 import pl.stock.logic.service.StockLogicService;
 
 /**
@@ -29,18 +34,24 @@ public class DownloadDailyQuoteFileScheduler {
 
 	// URL of file with daily quotes
 	@Value("${daily_quote.url:http://bossa.pl/pub/ciagle/mstock/sesjaall/sesjacgl.prn}")
-	private String fileURL;
+	private String stocksURL;
+	@Value("${funds_daily.url:http://bossa.pl/pub/fundinwest/mstock/sesjafun/sesjafun.prn}")
+	private String fundsURL;
 
 	// URL of file with all quotes from beginning
 	@Value("${all_quotes.url:http://bossa.pl/pub/ciagle/mstock/mstcgl.zip}")
-	//	@Value("${all_quotes.url:file:///C:/Users/piomin/Workspaces/stockgpw/stock-gpw/stock-logic/src/test/resources/pl/stock/logic/KGHM.zip}")
-	private String initialFileURL;
+	private String allStocksURL;
+	@Value("${funds_all.url:http://bossa.pl/pub/fundinwest/mstock/mstfun.zip}")
+	private String allFundsURL;
+	
+	// blacklist for companies imported from file
+	@Value("${blacklist.pattern:(WIG|DB|GN|RC|UC|BPH|INV|OPERA|ARK|ETF|LM|PKO|MWIG|SWIG).*}")
+	private String blacklist;
+	private Pattern blacklistPattern;
 
-	// parser for quotes history
+	// parsers for input files
 	@Autowired
 	private MultiQuotesFileParser multiParser;
-
-	// daily file records parser
 	@Autowired
 	private DailyQuotesFileParser dailyParser;
 
@@ -51,8 +62,8 @@ public class DownloadDailyQuoteFileScheduler {
 	@Autowired
 	private ApplicationContext context;
 
-	// log object
 	private final Logger LOGGER = Logger.getLogger(DownloadDailyQuoteFileScheduler.class);
+	private final pl.stock.data.beans.UpdateType[] updates = { pl.stock.data.beans.UpdateType.STOCK };
 
 	/**
 	 * Schedule download daily quote file task
@@ -60,28 +71,41 @@ public class DownloadDailyQuoteFileScheduler {
 	@Scheduled(cron = "*/60 * * * * ?")
 	public void schedule() {
 
-		try {
-			// check if it's initial update
-			if (stockLogic.checkIfInitialUpdate()) {
-				LOGGER.info("Initial update");
+		// set blacklist prefixes table
+		blacklistPattern = Pattern.compile(blacklist);
+		
+		for (pl.stock.data.beans.UpdateType update : updates) {
+			try {
+				final UpdateType updateType = stockLogic.detectUpdateType(update);
+				LOGGER.info(MessageFormat.format("Updating {0}", updateType));
 
-				// process all available quotes (large update)
-				processInitial();
-			} else {
-				if (stockLogic.checkIfUpdatePerformed()) {
-					LOGGER.info("Daily update");
-
-					// process daily quotes
-					processDaily();
-
-					// process daily statistic calculation
-					stockLogic.processDailyCalculation();
+				// add stock index for funds if not exists
+				if (updateType == UpdateType.INITIAL && update == pl.stock.data.beans.UpdateType.FUNDS) {
+					stockLogic.createIndexIfNotExists("FUNDUSZE");
 				}
+				
+				switch (updateType) {
+				case INITIAL:
+					processInitial(update);
+					break;
+
+				case DAILY:
+					processDaily(update);
+					break;
+
+				case MULTI:
+					processMulti(update);
+					break;
+
+				default:
+					break;
+				}
+
+			} catch (IOException e) {
+				LOGGER.error("EXCEPTION.DOWNLOAD.FILE", e);
+			} catch (ParseException e) {
+				LOGGER.error("EXCEPTION.PARSE.FILE", e);
 			}
-		} catch (IOException e) {
-			LOGGER.error("EXCEPTION.DOWNLOAD.FILE", e);
-		} catch (ParseException e) {
-			LOGGER.error("EXCEPTION.PARSE.FILE", e);
 		}
 	}
 
@@ -90,16 +114,27 @@ public class DownloadDailyQuoteFileScheduler {
 	 * @throws ParseException - exception while parsing file 
 	 * @throws IOException - exception while opening file
 	 */
-	private void processDaily() throws IOException, ParseException {
+	private void processDaily(pl.stock.data.beans.UpdateType updateType) throws IOException, ParseException {
 
 		// download file with quotes from URL
-		final File temp = DownloadFileUtils.downloadAndSaveURL(fileURL);
+		String fileUrl = null;
+		if (updateType == pl.stock.data.beans.UpdateType.STOCK) {
+			fileUrl = stocksURL;
+		} else {
+			fileUrl = fundsURL;
+		}
+		final File temp = DownloadFileUtils.downloadAndSaveURL(fileUrl);
 
 		// translate file into daily record object list
-		final List<DailyQuoteRecord> records = (List<DailyQuoteRecord>) dailyParser.parse(temp);
+		final List<DailyQuoteRecord> records = (List<DailyQuoteRecord>) dailyParser.parse(temp, blacklistPattern);
 
 		// call main processor
-		stockLogic.processQuoteUpdate(records, true);
+		stockLogic.processQuoteUpdate(records, updateType, true);
+
+		// process statistic calculation for parsed quotes
+		for (DailyQuoteRecord quote : records) {
+			stockLogic.processDailyCalculation(quote.getCompany().getSymbol(), new Date());
+		}
 	}
 
 	/**
@@ -107,23 +142,82 @@ public class DownloadDailyQuoteFileScheduler {
 	 * @throws ParseException - exception while parsing file 
 	 * @throws IOException - exception while opening file
 	 */
-	private void processInitial() throws IOException, ParseException {
+	private void processInitial(pl.stock.data.beans.UpdateType updateType) throws IOException, ParseException {
 
 		// download file with quotes from URL
-		final File temp = DownloadFileUtils.downloadAndSaveURL(initialFileURL);
+		String fileUrl = null;
+		if (updateType == pl.stock.data.beans.UpdateType.STOCK) {
+			fileUrl = allStocksURL;
+		} else {
+			fileUrl = allFundsURL;
+		}
+		final File temp = DownloadFileUtils.downloadAndSaveURL(fileUrl);
 
 		// translate file into daily record object list
-		final Map<String, List<DailyQuoteRecord>> records = (Map<String, List<DailyQuoteRecord>>) multiParser.parse(temp);
+		final Map<String, List<DailyQuoteRecord>> records = (Map<String, List<DailyQuoteRecord>>) multiParser.parse(temp, blacklistPattern);
 
 		// process in parallel records for all companies
-		for (String companyKey : records.keySet()) {
-			final String key = companyKey;
-			stockLogic.processQuoteUpdate(records.get(key), false);
-			stockLogic.processCalculationForCompany(key);
+		for (String companyKey : records.keySet()) {			
+			try {
+				final String key = companyKey;
+				stockLogic.processQuoteUpdate(records.get(key), updateType, false);
+				stockLogic.processInitialCalculation(key);
+			} catch (Exception e) {
+				LOGGER.error("EXCEPTION.IMPORT." + companyKey, e);
+			}
 		}
 
 		// store update 
-		stockLogic.saveUpdate();
+		stockLogic.saveUpdate(updateType);
 	}
 
+	/**
+	 * Process scheduled task
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	private void processMulti(pl.stock.data.beans.UpdateType updateType) throws IOException, ParseException {
+
+		// download file with quotes from URL
+		String fileUrl = null;
+		if (updateType == pl.stock.data.beans.UpdateType.STOCK) {
+			fileUrl = allStocksURL;
+		} else {
+			fileUrl = allFundsURL;
+		}
+		final File temp = DownloadFileUtils.downloadAndSaveURL(fileUrl);
+
+		// translate file into daily record object list
+		final Map<String, List<DailyQuoteRecord>> records = (Map<String, List<DailyQuoteRecord>>) multiParser.parse(temp, blacklistPattern);
+
+		// get last update
+		final Date update = stockLogic.getLastUpDate();
+
+		// process in parallel records for all companies
+		for (String companyKey : records.keySet()) {
+			try {
+				// get quotes for company
+				final List<DailyQuoteRecord> quotes = records.get(companyKey);
+
+				// create new list with quotes filtered by update date
+				final List<DailyQuoteRecord> quotesToAdd = new ArrayList<>();
+				for (DailyQuoteRecord quote : quotes) {
+					if (update.before(quote.getDate())) {
+						quotesToAdd.add(quote);
+					}
+				}
+
+				// store quotes and calculate statistic for them
+				stockLogic.processQuoteUpdate(quotesToAdd, updateType, false);
+				for (DailyQuoteRecord quote : quotesToAdd) {
+					stockLogic.processDailyCalculation(companyKey, quote.getDate());
+				}
+			} catch (Exception e) {
+				LOGGER.error("EXCEPTION.IMPORT." + companyKey, e);
+			}
+		}
+
+		// store update 
+		stockLogic.saveUpdate(updateType);
+	}
 }
