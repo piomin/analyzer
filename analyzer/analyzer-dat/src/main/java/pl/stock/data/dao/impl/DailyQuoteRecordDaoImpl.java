@@ -50,9 +50,24 @@ public class DailyQuoteRecordDaoImpl extends GenericDaoImpl<Long, DailyQuoteReco
 
 	@SuppressWarnings("unchecked")
 	public List<DailyQuoteRecord> findByCompanyOlderThan(Company company, Date maxDate, int maxCount) {
-		final String query = "select r from DailyQuoteRecord r join fetch r.statistic where r.company = :company and r.date <= :maxDate order by r.date desc";
+		final String query = "select r from DailyQuoteRecord r left join fetch r.statistic where r.company = :company and r.date <= :maxDate order by r.date desc";
 		return this.getSessionFactory().getCurrentSession().createQuery(query).setEntity("company", company).setDate("maxDate", maxDate).setMaxResults(maxCount)
 				.list();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DailyQuoteRecord> findByDateAndIds(Date from, Date to, Integer[] companyIds) {
+		return this.getSessionFactory().getCurrentSession()
+				.createQuery(
+						"select r from DailyQuoteRecord r join fetch r.statistic left join fetch r.company c where r.date between :from and :to and c.id in (:ids) order by c.id asc, r.date desc")
+				.setDate("from", from).setDate("to", to).setParameterList("ids", companyIds).list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<DailyQuoteRecord> findByDatePeriod(Date from, Date to) {
+		return this.getSessionFactory().getCurrentSession()
+				.createQuery("select r from DailyQuoteRecord r join fetch r.statistic s join fetch r.company c where r.date between :from and :to order by c.id asc, r.date desc")
+				.setDate("from", from).setDate("to", to).list();
+	}
 }

@@ -1,143 +1,65 @@
-package pl.stock.data.entity;
+package pl.stock.data.dto;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+public class StatisticRecord {
 
-import pl.piomin.core.data.generic.GenericEntity;
-
-@Entity
-@Table(name = "statistic_record")
-public class StatisticRecord extends GenericEntity<Long> {
-
-	@Id
-	@SequenceGenerator(name="statistic_pk_generator", sequenceName="statistic_record_seq", initialValue=1, allocationSize=1)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="statistic_pk_generator")
-	private Long id;
-	
-	@OneToOne
-	@JoinColumn(name = "quote_id")
-	private DailyQuoteRecord quote;
-	
-	@ManyToOne
-	@JoinColumn(name = "company_id")
-	private Company company;
-	
-	@Column
 	private double rsi;
-	
-	@Column
 	private double ema5;
-	
-	@Column
 	private double ema10;
-	
-	@Column
 	private double ema20;
-	
-	@Column
 	private double ema50;
-	
-	@Column
 	private double ema100;
-	
-	@Column(name = "average_vol5")
 	private int averageVol5;
-	
-	@Column(name = "average_vol12")
 	private int averageVol12;
-	
-	@Column(name = "average_vol26")
 	private int averageVol26;
-	
-	@Column(name = "average_vol50")
 	private int averageVol50;
-	
-	@Column
 	private double roc;
-	
-	@Column
 	private double sroc;
-	
-	@Column
 	private double sts;
-	
-	@Column(name = "sts_ema")
 	private double stsEma;
-	
-	@Column(name = "dmi_plus")
 	private double dmiPlus;
-	
-	@Column(name = "dmi_minus")
 	private double dmiMinus;
-	
-	@Column
 	private double adx;
-	
-	@Column
 	private double macd;
-	
-	@Column(name = "macd_ema")
 	private double macdEma;
-	
-	@Column
 	private double atr;
-	
-	@Column
 	private double ema12;
-	
-	@Column
 	private double ema14;
-	
-	@Column
 	private double ema26;
-	
-	@Column
 	private double sma14;
-	
-	@Column
 	private double sma28;
-	
-	@Column
 	private double sma42;
-
-	@Temporal(TemporalType.DATE)
-	@Column(name = "add_date")
 	private Date addDate;
 
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public DailyQuoteRecord getQuote() {
-		return quote;
-	}
-
-	public void setQuote(DailyQuoteRecord quote) {
-		this.quote = quote;
-	}
-
-	public Company getCompany() {
-		return company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
+	public StatisticRecord(pl.stock.data.entity.StatisticRecord statistic) {
+		this.rsi = statistic.getRsi();
+		this.ema5 = statistic.getEma5();
+		this.ema10 = statistic.getEma10();
+		this.ema20 = statistic.getEma20();
+		this.ema50 = statistic.getEma50();
+		this.ema100 = statistic.getEma100();
+		this.averageVol5 = statistic.getAverageVol5();
+		this.averageVol12 = statistic.getAverageVol12();
+		this.averageVol26 = statistic.getAverageVol26();
+		this.averageVol50 = statistic.getAverageVol50();
+		this.roc = statistic.getRoc();
+		this.sroc = statistic.getSroc();
+		this.sts = statistic.getSts();
+		this.stsEma = statistic.getStsEma();
+		this.dmiPlus = statistic.getDmiPlus();
+		this.dmiMinus = statistic.getDmiMinus();
+		this.adx = statistic.getAdx();
+		this.macd = statistic.getMacd();
+		this.macdEma = statistic.getMacdEma();
+		this.atr = statistic.getAtr();
+		this.ema12 = statistic.getEma12();
+		this.ema14 = statistic.getEma14();
+		this.ema26 = statistic.getEma26();
+		this.sma14 = statistic.getSma14();
+		this.sma28 = statistic.getSma28();
+		this.sma42 = statistic.getSma42();
+		this.addDate = statistic.getAddDate();
 	}
 
 	public double getRsi() {
@@ -356,22 +278,4 @@ public class StatisticRecord extends GenericEntity<Long> {
 		this.addDate = addDate;
 	}
 
-	@Override
-	public Long getPrimaryKey() {
-		return id;
-	}
-
-	@Override
-	public void setPrimaryKey(Long pk) {
-		this.id = pk;
-	}
-
-	/**
-	 * Not used
-	 */
-	@Override
-	public String getShortInfo() {
-		return null;
-	}
-	
 }

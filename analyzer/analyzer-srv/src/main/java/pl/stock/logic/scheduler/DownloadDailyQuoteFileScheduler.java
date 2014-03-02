@@ -32,6 +32,9 @@ import pl.stock.logic.service.StockLogicService;
 @Service
 public class DownloadDailyQuoteFileScheduler {
 
+	@Value("${scheduler.quotes.active:false}")
+	private boolean active;
+	
 	// URL of file with daily quotes
 	@Value("${daily_quote.url:http://bossa.pl/pub/ciagle/mstock/sesjaall/sesjacgl.prn}")
 	private String stocksURL;
@@ -71,6 +74,11 @@ public class DownloadDailyQuoteFileScheduler {
 	@Scheduled(cron = "*/60 * * * * ?")
 	public void schedule() {
 
+		// do not run scheduler if is set to inactive
+		if (!active) {
+			return;
+		}
+		
 		// set blacklist prefixes table
 		blacklistPattern = Pattern.compile(blacklist);
 		

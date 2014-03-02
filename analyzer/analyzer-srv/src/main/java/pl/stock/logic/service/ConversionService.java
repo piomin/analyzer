@@ -21,11 +21,11 @@ public class ConversionService {
 	 * @param statistics
 	 * @return
 	 */
-	public StatisticRecordSimple createStatisticSimple(List<StatisticRecord> statistics) {
+	public StatisticRecordSimple createStatisticSimple(List<DailyQuoteRecord> quotes) {
 		StatisticRecordSimple result = new StatisticRecordSimple();
-		StatisticRecord last = statistics.get(0);
-		StatisticRecord previous = statistics.get(1);
-		final DailyQuoteRecord lastQuote = last.getQuote();
+		StatisticRecord last = quotes.get(0).getStatistic();
+		StatisticRecord previous = quotes.get(1).getStatistic();
+		final DailyQuoteRecord lastQuote = quotes.get(0);
 		SignalStatus signal = null;
 
 		// fill RSI, ADX, STS, RoC, ATR
@@ -37,6 +37,7 @@ public class ConversionService {
 		result.setAtrPercentage(CalculationHelper.countPercentageDiff(last.getAtr(), lastQuote.getClose()));
 
 		// fill volume table
+		result.setVolumens(new double[5]);
 		result.addVolumen(0, lastQuote.getVolumen());
 		result.addVolumen(1, last.getAverageVol5());
 		result.addVolumen(2, last.getAverageVol12());
@@ -51,17 +52,17 @@ public class ConversionService {
 		// count prize % changes for 1, 3, 5, 10, 20 days
 		result.setPrizeChanges(new double[5]);
 		result.addPrizeChange(0, CalculationHelper.countPercentageDiff(previous.getQuote().getClose(), lastQuote.getClose()));
-		if (statistics.size() > 3) {
-			result.addPrizeChange(1, CalculationHelper.countPercentageDiff(statistics.get(3).getQuote().getClose(), lastQuote.getClose()));
+		if (quotes.size() > 3) {
+			result.addPrizeChange(1, CalculationHelper.countPercentageDiff(quotes.get(3).getClose(), lastQuote.getClose()));
 		}
-		if (statistics.size() > 5) {
-			result.addPrizeChange(2, CalculationHelper.countPercentageDiff(statistics.get(5).getQuote().getClose(), lastQuote.getClose()));
+		if (quotes.size() > 5) {
+			result.addPrizeChange(2, CalculationHelper.countPercentageDiff(quotes.get(5).getClose(), lastQuote.getClose()));
 		}
-		if (statistics.size() > 10) {
-			result.addPrizeChange(3, CalculationHelper.countPercentageDiff(statistics.get(10).getQuote().getClose(), lastQuote.getClose()));
+		if (quotes.size() > 10) {
+			result.addPrizeChange(3, CalculationHelper.countPercentageDiff(quotes.get(10).getClose(), lastQuote.getClose()));
 		}
-		if (statistics.size() > 20) {
-			result.addPrizeChange(4, CalculationHelper.countPercentageDiff(statistics.get(20).getQuote().getClose(), lastQuote.getClose()));
+		if (quotes.size() > 20) {
+			result.addPrizeChange(4, CalculationHelper.countPercentageDiff(quotes.get(20).getClose(), lastQuote.getClose()));
 		}
 
 		// detect DMI signal

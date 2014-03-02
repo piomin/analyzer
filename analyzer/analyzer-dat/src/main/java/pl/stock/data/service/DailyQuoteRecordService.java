@@ -19,4 +19,8 @@ public interface DailyQuoteRecordService extends GenericService<Long, DailyQuote
 	
 	List<DailyQuoteRecord> findByCompanyOlderThan(Company company, Date maxDate, int maxCount);
 	
+	List<DailyQuoteRecord> findByDateAndIds(Date from, Date to, Integer[] companyIds);
+	
+	List<DailyQuoteRecord> findByDatePeriod(Date from, Date to);
+	
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -27,6 +28,9 @@ public class DownloadIndicesListScheduler {
 
 	private final Logger LOGGER = Logger.getLogger(DownloadIndicesListScheduler.class);
 
+	@Value("${scheduler.indices.active:false}")
+	private boolean active;
+	
 	@Autowired
 	private CompanyService companyService;
 
@@ -39,6 +43,11 @@ public class DownloadIndicesListScheduler {
 	@Scheduled(cron = "0 0 */1 * * ?")
 	public void schedule() {
 
+		// do not run scheduler if is set to inactive
+		if (!active) {
+			return;
+		}
+		
 		// do not process if there is no update
 		if (updateService.count() == 0) {
 			return;

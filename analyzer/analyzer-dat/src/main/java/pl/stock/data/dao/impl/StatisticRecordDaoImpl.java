@@ -48,7 +48,7 @@ public class StatisticRecordDaoImpl extends GenericDaoImpl<Long, StatisticRecord
 				.getSessionFactory()
 				.getCurrentSession()
 				.createQuery(
-						"select a from StatisticRecord a join fetch a.quote b where b.date between :from and :to and a.company.id in (:ids) order by a.company.id asc, b.date desc")
+						"select a from StatisticRecord a left join fetch a.quote b left join fetch a.company c left join fetch b.company d where b.date between :from and :to and c.id in (:ids) order by c.id asc, b.date desc")
 				.setDate("from", from).setDate("to", to).setParameterList("ids", companyIds).list();
 	}
 

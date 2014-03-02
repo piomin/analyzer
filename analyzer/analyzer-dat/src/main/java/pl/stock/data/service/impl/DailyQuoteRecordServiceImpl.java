@@ -46,5 +46,15 @@ public class DailyQuoteRecordServiceImpl extends GenericServiceImpl<Long, DailyQ
 	public List<DailyQuoteRecord> findByCompanyOlderThan(Company company, Date maxDate, int maxCount) {
 		return ((DailyQuoteRecordDao) this.dao).findByCompanyOlderThan(company, maxDate, maxCount);
 	}
+
+	@Override
+	public List<DailyQuoteRecord> findByDateAndIds(Date from, Date to, Integer[] companyIds) {
+		return ((DailyQuoteRecordDao) this.dao).findByDateAndIds(from, to, companyIds);
+	}
+
+	@Override
+	public List<DailyQuoteRecord> findByDatePeriod(Date from, Date to) {
+		return ((DailyQuoteRecordDao) this.dao).findByDatePeriod(from, to);
+	}
 	
 }

@@ -294,7 +294,7 @@ public class StockLogicService {
 			final double[] stssEma = stsRet[1];
 
 			LOGGER.debug(MessageFormat.format("{0} | Statistics calculated", company.getSymbol()));
-			
+
 			// iterate over all quotes starting from oldest, count from
 			// sixth quote because this is EMA 5 first count
 			int startIndex = closes.length - 6;
@@ -454,12 +454,13 @@ public class StockLogicService {
 		calendar.add(Calendar.DAY_OF_YEAR, -30);
 		Company company = companyService.load(companyId);
 		DailyQuoteRecord quote = quoteService.findLastByCompany(company);
-		List<StatisticRecord> stats = statisticService.findByDateAndIds(calendar.getTime(), date, new Integer[] { companyId });
+		List<DailyQuoteRecord> quotes = quoteService.findByDateAndIds(calendar.getTime(), date, new Integer[] { companyId });
 
 		// creating and returning response
 		StatisticDetails details = new StatisticDetails();
 		details.setQuote(new pl.stock.data.dto.DailyQuoteRecord(quote));
-		details.setStatistic(conversionService.createStatisticSimple(stats));
+		details.setStatistic(conversionService.createStatisticSimple(quotes));
+		details.setFull(new pl.stock.data.dto.StatisticRecord(quotes.get(0).getStatistic()));
 		return details;
 	}
 
@@ -481,13 +482,13 @@ public class StockLogicService {
 	 */
 	public void createIndexIfNotExists(final String name) {
 		if (indexService.findByName(name) == null) {
-  		final StockIndex index = new StockIndex();
-  		index.setName(name);
-  		final Integer id = indexService.add(index);
-  		LOGGER.info(MessageFormat.format("Index {0} added", id));
+			final StockIndex index = new StockIndex();
+			index.setName(name);
+			final Integer id = indexService.add(index);
+			LOGGER.info(MessageFormat.format("Index {0} added", id));
 		}
 	}
-	
+
 	/**
 	 * Return last update add date
 	 * @return
@@ -509,27 +510,34 @@ public class StockLogicService {
 
 		// collect data, all records or filtered by parameter
 		List<StatisticRecordSimple> result = new ArrayList<>();
-		List<StatisticRecord> statistics = null;
+		List<DailyQuoteRecord> quotes = null;
 		if (ids != null) {
-			statistics = statisticService.findByDateAndIds(calendar.getTime(), date, ids);
+			if (ids.length > 0)
+				quotes = quoteService.findByDateAndIds(calendar.getTime(), date, ids);
+			else
+				return result;
 		} else {
-			statistics = statisticService.findByDatePeriod(calendar.getTime(), date);
+			quotes = quoteService.findByDatePeriod(calendar.getTime(), date);
 		}
 
 		// convert result
-		Company company = statistics.get(0).getQuote().getCompany();
-		List<StatisticRecord> companyStats = new ArrayList<>();
-		for (StatisticRecord statistic : statistics) {
-			if (!statistic.getQuote().getCompany().equals(company)) {
-				result.add(conversionService.createStatisticSimple(companyStats));
-				companyStats.clear();
+		if (quotes.size() > 0) {
+			Company company = quotes.get(0).getCompany();
+			List<DailyQuoteRecord> companyStats = new ArrayList<>();
+			for (DailyQuoteRecord quote : quotes) {
+				if (!quote.getCompany().equals(company)) {
+					result.add(conversionService.createStatisticSimple(companyStats));
+					companyStats.clear();
+				}
+				companyStats.add(quote);
+				company = quote.getCompany();
 			}
-			companyStats.add(statistic);
-			company = statistic.getQuote().getCompany();
-		}
 
-		// add last result and return result
-		result.add(conversionService.createStatisticSimple(companyStats));
+			// add last result and return result
+			result.add(conversionService.createStatisticSimple(companyStats));
+		}
+		
+		// result
 		return result;
 	}
 
