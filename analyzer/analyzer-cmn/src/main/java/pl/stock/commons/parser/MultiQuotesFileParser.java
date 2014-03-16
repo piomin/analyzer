@@ -62,10 +62,12 @@ public class MultiQuotesFileParser extends QuotesFileParser {
 				LOGGER.error("", e);
 			} finally {
 				IOUtils.closeQuietly(stream);
-				zip.close();
 			}
 		}
 
+		// closing zip file
+		zip.close();
+		
 		return records;
 	}
 
