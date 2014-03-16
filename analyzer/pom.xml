@@ -70,7 +70,7 @@
 					<skipDeploy>true</skipDeploy>
 				</configuration>
 			</plugin>
-			<plugin>
+			<plugin> 
 				<groupId>com.github.github</groupId>
 				<artifactId>site-maven-plugin</artifactId>
 				<version>0.8</version>
