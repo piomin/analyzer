@@ -7,7 +7,7 @@ public class StockIndex {
 
 	private Integer id;
 	private String name;
-	private List<Company> companies = new ArrayList<>();
+	private List<Company> companies = new ArrayList<Company>();
 
 	public StockIndex() {
 

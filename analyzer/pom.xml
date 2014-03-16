@@ -1,6 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>pl.piomin.stock.gpw</groupId>
@@ -8,11 +7,18 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<scm>
+		<connection>scm:git:git@github.com:piomin/pm-core.git</connection>
+		<url>https://github.com/piomin/pm-core</url>
+		<developerConnection>scm:git:git@github.com:piomin/pm-core.git</developerConnection>
+	</scm>
+
 	<distributionManagement>
-		<site>
-			<id>website</id>
-			<url>scp://webhost.company.com/www/website</url>
-		</site>
+		<repository>
+			<id>github-snapshots</id>
+			<name>GitHub ${project.artifactId} Repository</name>
+			<url>https://github.com/piomin/pm-mvn-repo/raw/master</url>
+		</repository>
 	</distributionManagement>
 
 	<modules>
@@ -22,12 +28,14 @@
 		<module>analyzer-srv</module>
 		<module>analyzer-web</module>
 	</modules>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.java.version>1.7</project.java.version>
+		<project.java.version>1.6</project.java.version>
 		<spring.version>3.1.4.RELEASE</spring.version>
+		<github.global.server>github-snapshots</github.global.server>
 	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -39,6 +47,53 @@
 					<source>${project.java.version}</source>
 					<target>${project.java.version}</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.3</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.doxia</groupId>
+						<artifactId>doxia-module-markdown</artifactId>
+						<version>1.4</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<skipDeploy>true</skipDeploy>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<version>0.8</version>
+				<configuration>
+					<message>Maven artifacts for ${project.version}</message>
+					<noJekyll>true</noJekyll>
+					<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+					<branch>refs/heads/master</branch>
+					<includes>
+						<include>**/*</include>
+					</includes>
+					<merge>true</merge>
+					<repositoryName>pm-mvn-repo</repositoryName>
+					<repositoryOwner>piomin</repositoryOwner>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -70,5 +125,5 @@
 			<version>1.2.17</version>
 		</dependency>
 	</dependencies>
-	
+
 </project>

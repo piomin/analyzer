@@ -208,7 +208,7 @@ public class DownloadDailyQuoteFileScheduler {
 				final List<DailyQuoteRecord> quotes = records.get(companyKey);
 
 				// create new list with quotes filtered by update date
-				final List<DailyQuoteRecord> quotesToAdd = new ArrayList<>();
+				final List<DailyQuoteRecord> quotesToAdd = new ArrayList<DailyQuoteRecord>();
 				for (DailyQuoteRecord quote : quotes) {
 					if (update.before(quote.getDate())) {
 						quotesToAdd.add(quote);

@@ -30,7 +30,7 @@ public class IndicesListHelper {
 	}
 
 	public static List<String> findAllNames(Document doc, String id, String type, String listType, String valueType) {
-		List<String> names = new ArrayList<>();
+		List<String> names = new ArrayList<String>();
 		Element searchType = getElementByType(getElement(doc, id), type);
 		Elements elements = getAllElementsByType(searchType, listType);
 		for (Element element : elements) {

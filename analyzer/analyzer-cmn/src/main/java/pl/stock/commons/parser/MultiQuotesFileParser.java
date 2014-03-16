@@ -34,7 +34,7 @@ public class MultiQuotesFileParser extends QuotesFileParser {
 		final ZipFile zip = new ZipFile(file);
 
 		// return list with daily quote records
-		final Map<String, List<DailyQuoteRecord>> records = new HashMap<>();
+		final Map<String, List<DailyQuoteRecord>> records = new HashMap<String, List<DailyQuoteRecord>>();
 
 		// read each entry in input stream and parse that file
 		final Enumeration<? extends ZipEntry> entries = zip.entries();
@@ -62,11 +62,9 @@ public class MultiQuotesFileParser extends QuotesFileParser {
 				LOGGER.error("", e);
 			} finally {
 				IOUtils.closeQuietly(stream);
+				zip.close();
 			}
 		}
-
-		// closing ZIP file
-		IOUtils.closeQuietly(zip);
 
 		return records;
 	}

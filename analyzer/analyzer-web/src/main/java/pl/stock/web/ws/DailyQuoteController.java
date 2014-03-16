@@ -36,7 +36,7 @@ public class DailyQuoteController {
 		LOG.debug(MessageFormat.format("GET api/quote/company/{0}", id));
 		Company company = companyService.load(id);
 		List<DailyQuoteRecord> quotes = quoteService.findByCompany(company, 50);
-		List<pl.stock.data.dto.DailyQuoteRecord> quoteDTOs = new ArrayList<>();
+		List<pl.stock.data.dto.DailyQuoteRecord> quoteDTOs = new ArrayList<pl.stock.data.dto.DailyQuoteRecord>();
 		for (DailyQuoteRecord quote : quotes) {
 			quoteDTOs.add(new pl.stock.data.dto.DailyQuoteRecord(quote));
 		}

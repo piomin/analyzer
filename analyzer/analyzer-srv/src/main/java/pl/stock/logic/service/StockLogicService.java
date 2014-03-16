@@ -509,7 +509,7 @@ public class StockLogicService {
 		calendar.add(Calendar.DAY_OF_YEAR, -30);
 
 		// collect data, all records or filtered by parameter
-		List<StatisticRecordSimple> result = new ArrayList<>();
+		List<StatisticRecordSimple> result = new ArrayList<StatisticRecordSimple>();
 		List<DailyQuoteRecord> quotes = null;
 		if (ids != null) {
 			if (ids.length > 0)
@@ -523,7 +523,7 @@ public class StockLogicService {
 		// convert result
 		if (quotes.size() > 0) {
 			Company company = quotes.get(0).getCompany();
-			List<DailyQuoteRecord> companyStats = new ArrayList<>();
+			List<DailyQuoteRecord> companyStats = new ArrayList<DailyQuoteRecord>();
 			for (DailyQuoteRecord quote : quotes) {
 				if (!quote.getCompany().equals(company)) {
 					result.add(conversionService.createStatisticSimple(companyStats));

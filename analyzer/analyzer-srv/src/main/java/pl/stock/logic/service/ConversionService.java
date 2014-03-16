@@ -100,7 +100,7 @@ public class ConversionService {
 	}
 
 	public List<pl.stock.data.dto.StockIndex> createStockIndexDTOs(List<StockIndex> indices) {
-		List<pl.stock.data.dto.StockIndex> dtos = new ArrayList<>();
+		List<pl.stock.data.dto.StockIndex> dtos = new ArrayList<pl.stock.data.dto.StockIndex>();
 		for (StockIndex stockIndex : indices) {
 			dtos.add(new pl.stock.data.dto.StockIndex(stockIndex.getId(), stockIndex.getName()));
 		}
