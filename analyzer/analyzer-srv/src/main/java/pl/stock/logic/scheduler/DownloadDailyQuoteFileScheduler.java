@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -30,25 +31,26 @@ import pl.stock.logic.service.StockLogicService;
  *
  */
 @Service
+@PropertySource("classpath:pl/stock/logic/stock-logic.properties")
 public class DownloadDailyQuoteFileScheduler {
 
-	@Value("${scheduler.quotes.active:false}")
+	@Value("${scheduler.quotes.active}")
 	private boolean active;
 	
 	// URL of file with daily quotes
-	@Value("${daily_quote.url:http://bossa.pl/pub/ciagle/mstock/sesjaall/sesjacgl.prn}")
+	@Value("${daily_quote.url}")
 	private String stocksURL;
-	@Value("${funds_daily.url:http://bossa.pl/pub/fundinwest/mstock/sesjafun/sesjafun.prn}")
+	@Value("${funds_daily.url}")
 	private String fundsURL;
 
 	// URL of file with all quotes from beginning
-	@Value("${all_quotes.url:http://bossa.pl/pub/ciagle/mstock/mstcgl.zip}")
+	@Value("${all_quotes.url}")
 	private String allStocksURL;
-	@Value("${funds_all.url:http://bossa.pl/pub/fundinwest/mstock/mstfun.zip}")
+	@Value("${funds_all.url}")
 	private String allFundsURL;
 	
 	// blacklist for companies imported from file
-	@Value("${blacklist.pattern:(WIG|DB|GN|RC|UC|BPH|INV|OPERA|ARK|ETF|LM|PKO|MWIG|SWIG).*}")
+	@Value("${blacklist.pattern}")
 	private String blacklist;
 	private Pattern blacklistPattern;
 

@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -24,11 +25,12 @@ import pl.stock.logic.helper.IndicesListHelper;
 @Service
 @Transactional(readOnly = false)
 @TransactionConfiguration(defaultRollback = false)
+@PropertySource("classpath:pl/stock/logic/stock-logic.properties")
 public class DownloadIndicesListScheduler {
 
 	private final Logger LOGGER = Logger.getLogger(DownloadIndicesListScheduler.class);
 
-	@Value("${scheduler.indices.active:false}")
+	@Value("${scheduler.indices.active}")
 	private boolean active;
 	
 	@Autowired
