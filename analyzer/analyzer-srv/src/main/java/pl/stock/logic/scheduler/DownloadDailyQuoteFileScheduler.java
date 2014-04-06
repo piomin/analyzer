@@ -170,7 +170,7 @@ public class DownloadDailyQuoteFileScheduler {
 		for (String companyKey : records.keySet()) {			
 			try {
 				final String key = companyKey;
-				stockLogic.processQuoteUpdate(records.get(key), updateType, false);
+				stockLogic.processInitialQuoteUpdate(records.get(key), updateType, false);
 				stockLogic.processInitialCalculation(key);
 			} catch (Exception e) {
 				LOGGER.error("EXCEPTION.IMPORT." + companyKey, e);

@@ -55,6 +55,55 @@ public class StockLogicService {
 	 * Process daily file update schedule
 	 * @param records - list of records read from file
 	 */
+	public void processInitialQuoteUpdate(final List<DailyQuoteRecord> records, final pl.stock.data.beans.UpdateType type, boolean finished) {
+
+		// number of records added
+		tasksInProgress++;
+
+		// finish if there is no records to process
+		if (records.size() == 0) {
+			return;
+		}
+		
+		// set company get from database in DailyQuoteRecord
+		final String symbol = records.get(0).getCompany().getSymbol();
+		Company company = companyService.findBySymbol(symbol);
+		if (company == null) {
+			company = new Company(symbol, symbol);
+			Integer id = companyService.add(company);
+			company.setId(id);
+			LOGGER.info(MessageFormat.format("{0}|Company added:{1}", symbol, company.getId()));
+			if (type == pl.stock.data.beans.UpdateType.FUNDS) {
+				StockIndex index = indexService.findByName("FUNDUSZE");
+				index.getCompanies().add(company);
+			}
+		}
+		
+		// iterating over all daily read records
+		for (DailyQuoteRecord record : records) {
+
+			// set company get from database in DailyQuoteRecord
+			record.setCompany(company);
+
+			// save daily quote record in database
+			final Long recordId = quoteService.add(record);
+			LOGGER.debug(MessageFormat.format("{0}|Daily quote added:{1}", symbol, recordId));
+		}
+		LOGGER.info(MessageFormat.format("{0}|Daily quotes stored", symbol));
+		
+		// save information about update status in database if all data imported
+		if (finished) {
+			saveUpdate(type);
+		} else {
+			tasksInProgress--;
+		}
+
+	}
+	
+	/**
+	 * Process daily file update schedule
+	 * @param records - list of records read from file
+	 */
 	public void processQuoteUpdate(final List<DailyQuoteRecord> records, final pl.stock.data.beans.UpdateType type, boolean finished) {
 
 		// number of records added
@@ -70,7 +119,7 @@ public class StockLogicService {
 				company = new Company(symbol, symbol);
 				Integer id = companyService.add(company);
 				company.setId(id);
-				LOGGER.info(MessageFormat.format("{0} | Company {1} added", symbol, company.getId()));
+				LOGGER.info(MessageFormat.format("{0}|Company added:{1}", symbol, company.getId()));
 				if (type == pl.stock.data.beans.UpdateType.FUNDS) {
 					StockIndex index = indexService.findByName("FUNDUSZE");
 					index.getCompanies().add(company);
@@ -80,7 +129,7 @@ public class StockLogicService {
 
 			// save daily quote record in database
 			final Long recordId = quoteService.add(record);
-			LOGGER.info(MessageFormat.format("{0} | Daily quote {1} added", symbol, recordId));
+			LOGGER.info(MessageFormat.format("{0}|Daily quote added:{1}", symbol, recordId));
 		}
 
 		// save information about update status in database if all data imported
@@ -142,7 +191,7 @@ public class StockLogicService {
 		// find daily quote history and last statistic record from database
 		final List<DailyQuoteRecord> quotes = quoteService.findByCompanyOlderThan(company, date, 100);
 		if (quotes.size() < 2) {
-			LOGGER.warn(MessageFormat.format("{0} | No qoutes found", companySymbol));
+			LOGGER.warn(MessageFormat.format("{0}|No qoutes found", companySymbol));
 			return;
 		}
 		final DailyQuoteRecord lastQuote = quotes.get(0);
@@ -217,7 +266,7 @@ public class StockLogicService {
 
 			// adding statistic to database
 			final Long statisticId = statisticService.add(actualStatistic);
-			LOGGER.info(MessageFormat.format("{0} | Statistic {1} added", company.getSymbol(), statisticId));
+			LOGGER.info(MessageFormat.format("{0}|Statistic added:{1}", company.getSymbol(), statisticId));
 		}
 	}
 
@@ -293,7 +342,7 @@ public class StockLogicService {
 			final double[] stss = stsRet[0];
 			final double[] stssEma = stsRet[1];
 
-			LOGGER.debug(MessageFormat.format("{0} | Statistics calculated", company.getSymbol()));
+			LOGGER.debug(MessageFormat.format("{0}|Statistics calculated", company.getSymbol()));
 
 			// iterate over all quotes starting from oldest, count from
 			// sixth quote because this is EMA 5 first count
@@ -386,9 +435,10 @@ public class StockLogicService {
 
 				statistic.setAddDate(new Date());
 				final Long statisticId = statisticService.add(statistic);
-				LOGGER.info(MessageFormat.format("{0} | Statistic {1} added", company.getSymbol(), statisticId));
+				LOGGER.debug(MessageFormat.format("{0}|Statistic added:{1}", company.getSymbol(), statisticId));
 			}
 
+			LOGGER.info(MessageFormat.format("{0}|Statistics stored", company.getSymbol()));
 		} catch (Exception e) {
 			LOGGER.error("ERR.CALC.STAT." + companySymbol, e);
 		}
