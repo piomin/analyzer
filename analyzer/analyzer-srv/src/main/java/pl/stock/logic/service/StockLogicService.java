@@ -175,6 +175,17 @@ public class StockLogicService {
 		}
 	}
 
+	/**
+	 * Check if records get from daily quotes file should be processed
+	 * @param type
+	 * @param recordsDate
+	 * @return
+	 */
+	public boolean isDataActual(pl.stock.data.beans.UpdateType type, Date recordsDate) {
+		 final UpdateHistory history = updateService.findNewestByType(type);
+		 return history.getAddDate().after(recordsDate);
+	}
+	
 	public int getTasksInProgress() {
 		return tasksInProgress;
 	}

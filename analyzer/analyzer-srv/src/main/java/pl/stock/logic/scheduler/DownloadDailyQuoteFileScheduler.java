@@ -138,6 +138,19 @@ public class DownloadDailyQuoteFileScheduler {
 		// translate file into daily record object list
 		final List<DailyQuoteRecord> records = (List<DailyQuoteRecord>) dailyParser.parse(temp, blacklistPattern);
 
+		// check if quotes are actual or should be updated
+		if (records.size() > 0) {
+			DailyQuoteRecord firstRecord = records.get(0);
+			if (stockLogic.isDataActual(updateType, firstRecord.getDate())) {
+				LOGGER.info(MessageFormat.format("{0}|Data is actual", updateType));
+				return;
+			} else {
+				LOGGER.info(MessageFormat.format("{0}|Data is not actual - processing", updateType));
+			}
+		} else {
+			return;
+		}
+		
 		// call main processor
 		stockLogic.processQuoteUpdate(records, updateType, true);
 
