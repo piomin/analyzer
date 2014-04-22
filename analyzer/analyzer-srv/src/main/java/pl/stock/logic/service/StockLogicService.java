@@ -49,16 +49,11 @@ public class StockLogicService {
 	@Autowired
 	private ConversionService conversionService;
 
-	private int tasksInProgress = 0;
-
 	/**
 	 * Process daily file update schedule
 	 * @param records - list of records read from file
 	 */
-	public void processInitialQuoteUpdate(final List<DailyQuoteRecord> records, final pl.stock.data.beans.UpdateType type, boolean finished) {
-
-		// number of records added
-		tasksInProgress++;
+	public void processInitialQuoteUpdate(final List<DailyQuoteRecord> records, final pl.stock.data.beans.UpdateType type) {
 
 		// finish if there is no records to process
 		if (records.size() == 0) {
@@ -90,14 +85,6 @@ public class StockLogicService {
 			LOGGER.debug(MessageFormat.format("{0}|Daily quote added:{1}", symbol, recordId));
 		}
 		LOGGER.info(MessageFormat.format("{0}|Daily quotes stored", symbol));
-		
-		// save information about update status in database if all data imported
-		if (finished) {
-			saveUpdate(type);
-		} else {
-			tasksInProgress--;
-		}
-
 	}
 	
 	/**
@@ -105,9 +92,6 @@ public class StockLogicService {
 	 * @param records - list of records read from file
 	 */
 	public void processQuoteUpdate(final List<DailyQuoteRecord> records, final pl.stock.data.beans.UpdateType type, boolean finished) {
-
-		// number of records added
-		tasksInProgress++;
 
 		// iterating over all daily read records
 		for (DailyQuoteRecord record : records) {
@@ -133,12 +117,9 @@ public class StockLogicService {
 		}
 
 		// save information about update status in database if all data imported
-		if (finished) {
-			saveUpdate(type);
-		} else {
-			tasksInProgress--;
+		if (finished && records.size() > 0) {
+			saveUpdate(type, records.get(0).getDate());
 		}
-
 	}
 
 	/**
@@ -183,11 +164,11 @@ public class StockLogicService {
 	 */
 	public boolean isDataActual(pl.stock.data.beans.UpdateType type, Date recordsDate) {
 		 final UpdateHistory history = updateService.findNewestByType(type);
-		 return history.getAddDate().after(recordsDate);
-	}
-	
-	public int getTasksInProgress() {
-		return tasksInProgress;
+		 Calendar calendar = GregorianCalendar.getInstance();
+		 calendar.setTime(recordsDate);
+		 calendar.set(Calendar.HOUR_OF_DAY, 23);
+		 calendar.set(Calendar.MINUTE, 59);
+		 return history.getAddDate().after(calendar.getTime());
 	}
 
 	/**
@@ -528,9 +509,9 @@ public class StockLogicService {
 	/**
 	 * Store update information with current date
 	 */
-	public void saveUpdate(final pl.stock.data.beans.UpdateType type) {
+	public void saveUpdate(final pl.stock.data.beans.UpdateType type, final Date date) {
 		final UpdateHistory history = new UpdateHistory();
-		history.setAddDate(new Date());
+		history.setAddDate(date);
 		history.setStatus(UpdateStatus.SUCCESS);
 		history.setType(type);
 		final Integer id = updateService.add(history);

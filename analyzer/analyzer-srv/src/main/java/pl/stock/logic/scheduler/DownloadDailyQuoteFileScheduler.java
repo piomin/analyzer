@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.format.datetime.DateFormatter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -134,13 +138,14 @@ public class DownloadDailyQuoteFileScheduler {
 			fileUrl = fundsURL;
 		}
 		final File temp = DownloadFileUtils.downloadAndSaveURL(fileUrl);
-
+		
 		// translate file into daily record object list
 		final List<DailyQuoteRecord> records = (List<DailyQuoteRecord>) dailyParser.parse(temp, blacklistPattern);
 
 		// check if quotes are actual or should be updated
 		if (records.size() > 0) {
 			DailyQuoteRecord firstRecord = records.get(0);
+			LOGGER.info(MessageFormat.format("{0}|Quotes date", new DateFormatter("yyyy-MM-dd HH:mm").print(firstRecord.getDate(), new Locale("pl"))));
 			if (stockLogic.isDataActual(updateType, firstRecord.getDate())) {
 				LOGGER.info(MessageFormat.format("{0}|Data is actual", updateType));
 				return;
@@ -183,7 +188,7 @@ public class DownloadDailyQuoteFileScheduler {
 		for (String companyKey : records.keySet()) {			
 			try {
 				final String key = companyKey;
-				stockLogic.processInitialQuoteUpdate(records.get(key), updateType, false);
+				stockLogic.processInitialQuoteUpdate(records.get(key), updateType);
 				stockLogic.processInitialCalculation(key);
 			} catch (Exception e) {
 				LOGGER.error("EXCEPTION.IMPORT." + companyKey, e);
@@ -191,7 +196,7 @@ public class DownloadDailyQuoteFileScheduler {
 		}
 
 		// store update 
-		stockLogic.saveUpdate(updateType);
+		stockLogic.saveUpdate(updateType, multiParser.getLatestDate());
 	}
 
 	/**
@@ -209,12 +214,24 @@ public class DownloadDailyQuoteFileScheduler {
 			fileUrl = allFundsURL;
 		}
 		final File temp = DownloadFileUtils.downloadAndSaveURL(fileUrl);
-
-		// translate file into daily record object list
-		final Map<String, List<DailyQuoteRecord>> records = (Map<String, List<DailyQuoteRecord>>) multiParser.parse(temp, blacklistPattern);
+		Date lastModified = new Date(temp.lastModified());
 
 		// get last update
 		final Date update = stockLogic.getLastUpDate();
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTime(update);
+		calendar.set(Calendar.HOUR_OF_DAY, 23);
+		calendar.set(Calendar.MINUTE, 59);
+		
+		// process only if data file date modification older than last update 
+		LOGGER.info(MessageFormat.format("MULTI|Data file last update:{0}", new DateFormatter("yyyy-MM-dd HH:mm").print(lastModified, new Locale("pl"))));
+		if (!lastModified.after(update)) {
+			LOGGER.info("MULTI|Data actual");
+			return;
+		}
+		
+		// translate file into daily record object list
+		final Map<String, List<DailyQuoteRecord>> records = (Map<String, List<DailyQuoteRecord>>) multiParser.parse(temp, blacklistPattern);
 
 		// process in parallel records for all companies
 		for (String companyKey : records.keySet()) {
@@ -229,7 +246,8 @@ public class DownloadDailyQuoteFileScheduler {
 						quotesToAdd.add(quote);
 					}
 				}
-
+				LOGGER.info(MessageFormat.format("{0}|Processing quotes:{1}", companyKey, quotesToAdd.size()));
+				
 				// store quotes and calculate statistic for them
 				stockLogic.processQuoteUpdate(quotesToAdd, updateType, false);
 				for (DailyQuoteRecord quote : quotesToAdd) {
@@ -241,6 +259,6 @@ public class DownloadDailyQuoteFileScheduler {
 		}
 
 		// store update 
-		stockLogic.saveUpdate(updateType);
+		stockLogic.saveUpdate(updateType, multiParser.getLatestDate());
 	}
 }

@@ -44,6 +44,19 @@
 				</resources>
 			</build>
 		</profile>
+		<profile>
+			<id>amazon</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/resources/amazon</directory>
+					</resource>
+				</resources>
+			</build>
+		</profile>		
 	</profiles>
 
 	<build>

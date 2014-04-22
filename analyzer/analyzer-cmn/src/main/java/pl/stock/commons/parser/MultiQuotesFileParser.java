@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,8 @@ import pl.stock.data.entity.DailyQuoteRecord;
 @Component
 public class MultiQuotesFileParser extends QuotesFileParser {
 
+	private Date latestDate;
+	
 	@Override
 	public Map<String, List<DailyQuoteRecord>> parse(File file, Pattern blacklist) throws ParseException, IOException {
 
@@ -51,8 +54,16 @@ public class MultiQuotesFileParser extends QuotesFileParser {
 					final List<String> lines = IOUtils.readLines(stream);
 					final String titleLine = lines.remove(0);
 					LOGGER.debug(MessageFormat.format("Title line {0} removed.", titleLine));
-					records.put(company, translateLines(lines, blacklist));
+					final List<DailyQuoteRecord> quotes = translateLines(lines, blacklist);  
+					records.put(company, quotes);
 
+					// store newest date from records
+					for (DailyQuoteRecord quote : quotes) {
+						if (latestDate == null && quote.getDate().after(latestDate)) {
+							latestDate = quote.getDate();
+						}
+					}
+					
 					// finished entry log
 					LOGGER.info(MessageFormat.format("Zip entry {0} translated.", entry.getName()));
 				}
@@ -69,6 +80,10 @@ public class MultiQuotesFileParser extends QuotesFileParser {
 		zip.close();
 		
 		return records;
+	}
+
+	public Date getLatestDate() {
+		return latestDate;
 	}
 
 }
